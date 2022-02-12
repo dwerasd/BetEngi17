@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="기본">
+      <UniqueIdentifier>{37777731-9222-42b2-9b77-1fc237396743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신">
+      <UniqueIdentifier>{1bec733d-d3b6-429a-a465-d29ee735fe91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="기본\헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="기본\소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="기본\리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="기본\트레이">
+      <UniqueIdentifier>{d1a120c5-5805-45b0-8592-9881e52f231f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\파이프">
+      <UniqueIdentifier>{1ef4ed7d-f830-4820-9516-f32fdb47deb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{fa207b6c-12ce-4c22-ad7a-471bf6127876}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CMain.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CTrayIcon.h">
+      <Filter>기본\트레이</Filter>
+    </ClInclude>
+    <ClInclude Include="CPipeClient.h">
+      <Filter>통신\파이프</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Defines\NetworkDef.h">
+      <Filter>통신</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+    <Image Include="DCreonAPI.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CTrayIcon.cpp">
+      <Filter>기본\트레이</Filter>
+    </ClCompile>
+    <ClCompile Include="CPipeClient.cpp">
+      <Filter>통신\파이프</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DCreonAPI.rc">
+      <Filter>기본\리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Win32\temp\Release\DCreonAPI\cpsysdib.tli">
+      <Filter>NewFilter1</Filter>
+    </None>
+    <None Include="..\Win32\temp\Release\DCreonAPI\cputil.tlh">
+      <Filter>NewFilter1</Filter>
+    </None>
+    <None Include="..\Win32\temp\Release\DCreonAPI\cputil.tli">
+      <Filter>NewFilter1</Filter>
+    </None>
+    <None Include="..\Win32\temp\Release\DCreonAPI\cpdib.tlh">
+      <Filter>NewFilter1</Filter>
+    </None>
+    <None Include="..\Win32\temp\Release\DCreonAPI\cpdib.tli">
+      <Filter>NewFilter1</Filter>
+    </None>
+    <None Include="..\Win32\temp\Release\DCreonAPI\cpsysdib.tlh">
+      <Filter>NewFilter1</Filter>
+    </None>
+  </ItemGroup>
+</Project>
