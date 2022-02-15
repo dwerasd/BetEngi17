@@ -14,18 +14,22 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 {
 	_pParam;
 
+	if (!pNetClient)
+	{
+		pNetClient = new net::C_NET_CLIENT("127.0.0.1");
+		pNetClient->ThreadStart();
+	}
 	if (!키움OCX) { 키움OCX = new C_KH_OPEN_API(); }
 
-	파이프통신 = new pipe::C_PIPE_CLIENT(L"PipeClientKiwoom", L"PipeServerKiwoom");
-	if (!파이프통신)
+	pPipe = new pipe::C_PIPE_CLIENT(L"PipeClientKiwoom", L"PipeServerKiwoom");
+	if (!pPipe)
 	{
 		디뷰메시지("파이프 접속 실패");
 		return(0);
 	}
-	파이프통신->ThreadStart();
-
-	
-	키움OCX->SetHandler(파이프통신);
+	pPipe->ThreadStart();
+	키움OCX->SetHandler(pPipe);
+	키움OCX->SetNetHandler(pNetClient);
 
 	LPPACKET_BASE pPipePacket = nullptr;
 	do
@@ -46,7 +50,7 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 					break;
 				case _PKT_PIPE_CONNECTED_:
 					DBGPRINT("받음(_PKT_PIPE_CONNECTED): %s", pPipePacket->bytBuffer);
-					파이프통신->Send(_브릿지패킷_키움_클라이언트_접속_);
+					pPipe->Send(_브릿지패킷_키움_클라이언트_접속_);
 					break;
 				case _브릿지패킷_키움_로그인요청_:	// 로그인에 성공하면 OnEventConnect 함수로 콜백이 온다.
 					if (!키움OCX->CommConnect())				// 키움 필수
@@ -57,7 +61,7 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 					{
 						DBGPRINT("실패: 키움 로그인 팝업");
 						AfxMessageBox("로그인창 호출 실패");
-						파이프통신->Send(_브릿지패킷_키움_초기화실패_);
+						pPipe->Send(_브릿지패킷_키움_초기화실패_);
 					}
 					break;
 				case _브릿지패킷_키움_조건식요청_:
@@ -117,7 +121,7 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 							PACKET_BASE netPacket =
 							{
 								sizeof(STOCK_INFO_KIWOOM)				// 데이터크기
-								, _PKT_PIPE_KIWOOM_RECEIVE_STOCK_INFO_			// 헤더
+								, _PKT_PIPE_KIWOOM_RECEIVE_STOCK_INFO_	// 헤더
 								, { 0 }									// 보낼 내용
 							};
 							LPSTOCK_INFO_KIWOOM pStockInfo = (LPSTOCK_INFO_KIWOOM)&netPacket.bytBuffer[0];
@@ -157,9 +161,13 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 
 							//DBGPRINT("sizeof(PACKET_BASE): %d, sizeof(PipePacket.bytBuffer): %d", sizeof(PACKET_BASE), netPacket.nPacketSize);
 
-							파이프통신->Send(&netPacket);
+							pPipe->Send(&netPacket);
+							//if (pNetClient->IsConnect())
+							//{
+							//	pNetClient->Send(_PKT_NET_RECEIVE_STOCKINFO_KIWOOM_, (LPBYTE)netPacket.bytBuffer, sizeof(STOCK_INFO_KIWOOM));
+							//}
 						}
-						파이프통신->Send(_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_);
+						pPipe->Send(_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_);
 						listStockCodes.clear();
 						// 할당받은 메모리 제거
 						//DSAFE_DELETE_ARRAY(pBuffer);

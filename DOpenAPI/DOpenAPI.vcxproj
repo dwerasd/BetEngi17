@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClInclude Include="..\Defines\NetworkDef.h" />
     <ClInclude Include="CKHOpenAPICtrl.h" />
+    <ClInclude Include="CNetClient.h" />
     <ClInclude Include="CPipeClient.h" />
     <ClInclude Include="DOpenAPI.h" />
     <ClInclude Include="DOpenAPIDlg.h" />
@@ -129,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="CKHOpenAPICtrl.cpp" />
     <ClCompile Include="CKHOpenAPIHandler.cpp" />
+    <ClCompile Include="CNetClient.cpp" />
     <ClCompile Include="CPipeClient.cpp" />
     <ClCompile Include="CPipeHandler.cpp" />
     <ClCompile Include="DOpenAPI.cpp" />

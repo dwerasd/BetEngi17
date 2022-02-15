@@ -29,6 +29,11 @@ void C_KH_OPEN_API::SetHandler(pipe::C_PIPE_CLIENT* _pHandler)
 	pPipe = _pHandler;
 }
 
+void C_KH_OPEN_API::SetNetHandler(net::C_NET_CLIENT* _pHandler)
+{
+	pNet = _pHandler;
+}
+
 void C_KH_OPEN_API::OnEventConnect(long _nErrCode)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
@@ -180,6 +185,10 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			strcpy_s(pData->szPriceBuy, sizeof(pData->szPriceBuy), strPriceBuy.GetBuffer());
 			strcpy_s(pData->szStrength, sizeof(pData->szStrength), strStrength.GetBuffer());
 			pPipe->Send(&packet);
+			if (pNet->IsConnect())
+			{
+				pNet->Send(_PKT_NET_RECEIVE_TRANSACTION_KIWOOM_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION));
+			}
 		}
 		/*
 		else if (!strcmp(_sRealType, "주식호가잔량"))

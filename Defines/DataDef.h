@@ -470,6 +470,35 @@ typedef struct _TICK_TRANSACTION
 	void clear() { ::memset(this, 0, sizeof(_TICK_TRANSACTION)); }
 } TICK_TRANSACTION, *LPTICK_TRANSACTION;
 
+typedef struct _TICK_TRANSACTION_KIWOOM
+{	// 저장할 버퍼
+	ULONG nSequence;			// 받은 순서 ( 키움으로부터 )
+	char szCode[7];				// "005930"
+	char nTransType;			// 1 = 매수, 2 = 매도, 3 = 단일가매매(동시호가)
+	ULONG nTime;				// 체결시간, 파일 이름이 11시59분31초, 여기 뒤에 밀리초 3자리 붙인다.
+	float fPrice;				// 체결가격(선물 때문에 float 으로 저장하자)
+	float nTransVolume;			// 체결량
+	float nAccrueVolume;		// 누적거래량
+	float 최우선매도호가;		// 체결량
+	float 최우선매수호가;		// 체결량
+	float 키움강도;
+	void clear() { ::memset(this, 0, sizeof(_TICK_TRANSACTION_KIWOOM)); }
+} TICK_TRANSACTION_KIWOOM, *LPTICK_TRANSACTION_KIWOOM;
+
+typedef struct _TICK_TRANSACTIONF
+{	// 저장할 버퍼
+	ULONG nSequence;			// 받은 순서 ( 키움으로부터 )
+	char szCode[7];				// "005930"
+	char nTransType;			// 1 = 매수, 2 = 매도, 3 = 단일가매매(동시호가)
+	ULONG nTime;				// 체결시간, 파일 이름이 11시59분31초, 여기 뒤에 밀리초 3자리 붙인다.
+	float fPrice;				// 체결가격(선물 때문에 float 으로 저장하자)
+	float nTransVolume;			// 체결량
+	float nAccrueVolume;		// 누적거래량
+	float 최우선매도호가;		// 체결량
+	float 최우선매수호가;		// 체결량
+	void clear() { ::memset(this, 0, sizeof(_TICK_TRANSACTIONF)); }
+
+} TICK_TRANSACTIONF, *LPTICK_TRANSACTIONF;
 #pragma pack(pop)			// 정렬 설정을 이전 상태(기본값)로 되돌림
 
 typedef struct _주식호가잔량변환

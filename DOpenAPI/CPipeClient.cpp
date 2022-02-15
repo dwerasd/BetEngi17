@@ -71,7 +71,7 @@ namespace pipe
 			}
 		}
 		//DBGPRINT("C_PIPE_CLIENT_SERVER::Send() ret");
-		return dwWritten;
+		return(dwWritten);
 	}
 
 	int C_PIPE_CLIENT::Send(WORD _dwHeader, LPVOID _pData, WORD _nSize)
@@ -124,7 +124,8 @@ namespace pipe
 					DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다: %x", ulThreadId);
 					//AfxMessageBox("파이프 서버에 접속할 수 없습니다");
 					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
-					pNetPacket->Init();
+					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
+
 					pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
 					theApp.PushReceivePacket(pNetPacket);				// 패킷을 직접 넣고
 					Send(_브릿지패킷_키움_클라이언트_접속해제_);		// 접속 해제를 날린다.
@@ -144,10 +145,11 @@ namespace pipe
 					pEventRecv->Set();
 					//DBGPRINT("C_PIPE_CLIENT::ThreadFunc(메시지 받음): %d / %d", NetPacketBuffer.nPacketIndex, nRecvSize);
 					// 복사해서 큐에 넣기만 한다.
-					LPPACKET_BASE 패킷포 = new PACKET_BASE();		// 새로 할당받는다.
-					패킷포->Init();
-					memcpy_s(패킷포, sizeof(PACKET_BASE), &NetPacketBuffer, nRecvSize);
-					theApp.PushReceivePacket(패킷포);
+					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
+					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
+
+					memcpy_s(pNetPacket, sizeof(PACKET_BASE), &NetPacketBuffer, nRecvSize);
+					theApp.PushReceivePacket(pNetPacket);
 				}
 				else
 				{	// 여기에 오면 파이프를 초기화하고 재접속 시도를 하게 된다.

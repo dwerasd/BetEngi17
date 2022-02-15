@@ -4,13 +4,9 @@
 #include <DarkCore/DMemory.h>
 #include <DarkCore/DSocket.h>
 
-//////////////////////////////////////////////////////////////////////////
-// 0x1000 은 4096 == 4키로 바이트이다. 패킷당 1키로 바이트를 넘지 않는다.
-#if (_MSC_VER > 1600) && (__cplusplus >= 201103L)
-constexpr size_t _MAX_PACKET_SIZE_ = (1 << 15);
-#else
-#define _MAX_PACKET_SIZE_					(1 << 13)	// 8192
-#endif
+#include <DNetwork/NetworkDef.h>
+
+
 
 #if __cplusplus > 201703L
 enum
@@ -97,7 +93,9 @@ enum _PKT_INDEX_
 	, _PKT_NET_PACKET_NONE_ = 1000
 	, _PKT_NET_CONNECTED_								// 접속 직후 보냄
 	, _PKT_NET_DISCONNECTED_							// 프로그램이 종료될 때 보냄.
-
+	, _PKT_NET_RECEIVE_STOCKINFO_KIWOOM_				// 키움 종목 패킷이다.
+	, _PKT_NET_RECEIVE_TRANSACTION_KIWOOM_				// 키움 체결 데이터다
+	, _PKT_NET_RECEIVE_TRANSACTION_EBEST_				// 이베스트 체결데이터다.
 	, _PKT_NET_REQUEST_LOGIN_							// 유저 로그인
 	, _PKT_NET_RESULT_LOGIN_SUCCEED_					// 로그인 성공
 	, _PKT_NET_RESULT_LOGIN_FAILED_						// 로그인 실패
@@ -134,22 +132,6 @@ enum
 
 // 이 아래는 바이트 단위로 통신하는 패킷이다.
 #pragma pack(push,1)
-typedef struct _PACKET_HEADER
-{
-	WORD nPacketSize;						// 패킷 사이즈 일단 큐로 쓰고 링버퍼는 나중에?
-	WORD nPacketIndex;						// 패킷 인덱스
-} PACKET_HEADER, *LPPACKET_HEADER;
-
-typedef struct _PACKET_BASE
-	: public _PACKET_HEADER
-{
-	BYTE bytBuffer[_MAX_PACKET_SIZE_ - sizeof(_PACKET_HEADER)];
-	void Init()
-	{
-		ZeroMemory(this, sizeof(_PACKET_BASE));
-	}
-} PACKET_BASE, *LPPACKET_BASE;
-
 typedef struct _PIPE_GET_STOCK_OHLCV
 {
 	ULONG nCountSticks;				// 봉 갯수 ex) 99999999 
@@ -196,19 +178,6 @@ typedef struct _NET_PACKET_HEADER
 } NET_PACKET_HEADER, * LPNET_PACKET_HEADER;
 
 
-
-// 이 아래는 뭉치거나 잘린 패킷을 처리하기 위한 구조체다
-typedef struct _NET_PACKET_BUNDLE
-{
-	long nBytesPacket;					// 받아야 하는 패킷 크기
-	long nBytesTransferred;				// 받아진 크기
-	LPVOID pSession;					// 해당 세션.
-	BYTE bytBuffer[_MAX_PACKET_SIZE_ - _ALIGNMENT_];
-	void clear()
-	{
-		ZeroMemory(this, sizeof(_NET_PACKET_BUNDLE));
-	}
-} NET_PACKET_BUNDLE, *LPNET_PACKET_BUNDLE;
 
 typedef struct _PACKET_BUNDLE		// 패킷 뭉치
 {

@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="기본">
+      <UniqueIdentifier>{c9c56037-0e43-4353-a568-cb84c5c3c38b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="기본\헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="기본\소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="기본\리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MemDB">
+      <UniqueIdentifier>{9584dfd7-cb0b-44c9-8d51-16d63cb4f90c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="서버">
+      <UniqueIdentifier>{45f65438-b12e-4e3a-9999-00a6e06e722c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CMain.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CMemDB.h">
+      <Filter>MemDB</Filter>
+    </ClInclude>
+    <ClInclude Include="CNetServer.h">
+      <Filter>서버</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BetServ.rc">
+      <Filter>기본\리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+    <Image Include="BetServ.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMemDB.cpp">
+      <Filter>MemDB</Filter>
+    </ClCompile>
+    <ClCompile Include="CNetServer.cpp">
+      <Filter>서버</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -14,6 +14,8 @@
 #include <DOpenSources/readerwriterqueue.h>
 #include <DOpenSources/blockingconcurrentqueue.h>
 
+#include "CNetClient.h"
+
 #include "resource.h"		// 주 기호입니다.
 #include "CKHOpenAPICtrl.h"			// 키움 필수
 #if defined(_USE_RADAR_)
@@ -45,7 +47,9 @@ public:
 	// 여기부터 추가하는거다.
 	C_KH_OPEN_API* 키움OCX{ nullptr };			// 키움 필수
 
-	pipe::C_PIPE_CLIENT* 파이프통신{ nullptr };
+	pipe::C_PIPE_CLIENT* pPipe{ nullptr };
+	net::C_NET_CLIENT* pNetClient{ nullptr };
+
 	void PushReceivePacket(LPPACKET_BASE _pData);
 	
 	//void RequestListConditions();			// 저장 된 키움 조건식 리스트 요청

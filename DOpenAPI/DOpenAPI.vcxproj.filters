@@ -34,6 +34,9 @@
     <Filter Include="기본\NewFilter1">
       <UniqueIdentifier>{8f6d2be8-9204-4645-bcfb-7b5b3e6efbd7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="통신\네트워크">
+      <UniqueIdentifier>{c22d3954-6286-4ae0-92ee-409c112a9ea2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -66,6 +69,9 @@
     <ClInclude Include="..\Defines\NetworkDef.h">
       <Filter>통신</Filter>
     </ClInclude>
+    <ClInclude Include="CNetClient.h">
+      <Filter>통신\네트워크</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -88,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="CPipeHandler.cpp">
       <Filter>기본\NewFilter1</Filter>
+    </ClCompile>
+    <ClCompile Include="CNetClient.cpp">
+      <Filter>통신\네트워크</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -115,7 +115,7 @@ namespace pipe
 					}
 					DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다");
 					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
-					pNetPacket->Init();
+					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
 
 					pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
 					pMain->PushData(pNetPacket);
@@ -138,7 +138,7 @@ namespace pipe
 					//DBGPRINT("C_PIPE_CLIENT::ThreadFunc(메시지 받음): %d / %d", NetPacketBuffer.nPacketIndex, nRecvSize);
 					// 복사해서 큐에 넣기만 한다.
 					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
-					pNetPacket->Init();
+					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
 
 					memcpy_s(pNetPacket, sizeof(PACKET_BASE), &NetPacketBuffer, nRecvSize);
 					pMain->PushData(pNetPacket);
