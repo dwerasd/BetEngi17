@@ -39,7 +39,7 @@ void C_KH_OPEN_API::OnEventConnect(long _nErrCode)
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	try
 	{
-		PACKET_BASE 패킷 =
+		PACKET_BASE packet =
 		{
 			0
 			, _브릿지패킷_키움_초기화실패_
@@ -51,7 +51,7 @@ void C_KH_OPEN_API::OnEventConnect(long _nErrCode)
 			//HWND pWnd = ::FindWindow(NULL, "Open API Login");
 
 			DBGPRINT("OnEventConnect() - 로그인 성공");
-			LPLOGIN_INFO_KIWOOM 로그인정보포 = (LPLOGIN_INFO_KIWOOM)&패킷.bytBuffer[0];
+			LPLOGIN_INFO_KIWOOM 로그인정보포 = (LPLOGIN_INFO_KIWOOM)&packet.bytBuffer[0];
 			로그인정보포->모의서버 = (bool)::atoi(KOA_Functions("GetServerGubun", "").GetBuffer());
 
 			// 계좌 비밀번호 입력창을 출력한다.
@@ -100,17 +100,17 @@ void C_KH_OPEN_API::OnEventConnect(long _nErrCode)
 			//{
 			//	DBGPRINT("개자버너: %s", 로그인정보포->계좌번호[i]);
 			//}
-			패킷.nPacketSize = sizeof(LOGIN_INFO_KIWOOM);
-			패킷.nPacketIndex = _브릿지패킷_키움_로그인성공_;
-			pPipe->Send(&패킷);	// 성공은 헤더만 날린다.
+			packet.nPacketSize = sizeof(LOGIN_INFO_KIWOOM);
+			packet.nPacketIndex = _브릿지패킷_키움_로그인성공_;
+			if (pPipe) { pPipe->Send(&packet); }	// 성공은 헤더만 날린다.
 		}
 		else
 		{	// 로그인 실패
 			DBGPRINT("OnEventConnect() - 로그인 실패: %d", _nErrCode);
-			패킷.nPacketSize = sizeof(PLONG);
-			패킷.nPacketIndex = _브릿지패킷_키움_초기화실패_;
-			*(PLONG)패킷.bytBuffer = _nErrCode;		// 실패
-			pPipe->Send(&패킷);
+			packet.nPacketSize = sizeof(PLONG);
+			packet.nPacketIndex = _브릿지패킷_키움_초기화실패_;
+			*(PLONG)packet.bytBuffer = _nErrCode;		// 실패
+			if (pPipe) { pPipe->Send(&packet); }
 		}
 	}
 	catch (...)
@@ -122,18 +122,26 @@ void C_KH_OPEN_API::OnEventConnect(long _nErrCode)
 void C_KH_OPEN_API::OnReceiveTrData(LPCSTR _sScrNum, LPCSTR sRQName, LPCSTR sTrCode, LPCSTR sRecordName, LPCSTR sPrevNext, long nDataLength, LPCSTR sErrorCode, LPCSTR sMessage, LPCSTR sSplmMsg)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	_sScrNum;
+	sRQName;
+	sRecordName;
+	sPrevNext;
+	nDataLength;
+	sErrorCode;
+	sMessage;
+	sSplmMsg;
 	try
 	{
-		PACKET_BASE 패킷;
-		if (!strcmp(_TR_OPW00001_, sTrCode))
+		PACKET_BASE packet;
+		if (!::strcmp(_TR_OPW00001_, sTrCode))
 		{	// 예수금상세현황요청
-			키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)&패킷.bytBuffer[0];
+			키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)&packet.bytBuffer[0];
 			현황포->예수금 = ::_atoi64(GetCommData(sTrCode, "예수금상세현황", 0, "예수금").GetBuffer());
 			현황포->출금가능금액 = ::_atoi64(GetCommData(sTrCode, "예수금상세현황", 0, "출금가능금액").GetBuffer());
 			현황포->주문가능금액 = ::_atoi64(GetCommData(sTrCode, "예수금상세현황", 0, "주문가능금액").GetBuffer());
-			패킷.nPacketSize = sizeof(키움_예수금상세현황);
-			패킷.nPacketIndex = _브릿지패킷_키움_예수금상세현황받음_;
-			pPipe->Send(&패킷);
+			packet.nPacketSize = sizeof(키움_예수금상세현황);
+			packet.nPacketIndex = _브릿지패킷_키움_예수금상세현황받음_;
+			if (pPipe) { pPipe->Send(&packet); }
 		}
 	}
 	catch (...)
@@ -146,12 +154,13 @@ void C_KH_OPEN_API::OnReceiveTrData(LPCSTR _sScrNum, LPCSTR sRQName, LPCSTR sTrC
 void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCSTR _sRealData)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	_sRealData;
 	//char szBuffer[(1 << 10)];
 	//sprintf(szBuffer, "%s/%s/%s", _sRealKey, _sRealType, _sRealData);
 	//pMainLog->Write((LPVOID)szBuffer, szBuffer);
 	try
 	{
-		if (!strcmp(_sRealType, "주식체결"))
+		if (!::strcmp(_sRealType, "주식체결"))
 		{	// 보낼 데이터를 문자열로 뽑는다
 			CStringA strClose = GetCommRealData(_sRealKey, 10);			// 현재가
 			CStringA strAccrueVolume = GetCommRealData(_sRealKey, 13);	// 누적거래량은 누락 확인을 위해
@@ -173,18 +182,18 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			};
 			LPKIWOOM_REALDATA_TRANSACTION pData = (LPKIWOOM_REALDATA_TRANSACTION)&packet.bytBuffer[0];
 			pData->nRealType = _키움_주식체결_;
-			strcpy_s(pData->szStockCode, sizeof(pData->szStockCode), _sRealKey);
-			strcpy_s(pData->szTime, sizeof(pData->szTime), strTime.GetBuffer());
-			strcpy_s(pData->szClose, sizeof(pData->szClose), strClose.GetBuffer());
-			strcpy_s(pData->szVolume, sizeof(pData->szVolume), strVolume.GetBuffer());
-			strcpy_s(pData->szAccrueVolume, sizeof(pData->szAccrueVolume), strAccrueVolume.GetBuffer());
-			strcpy_s(pData->szOpen, sizeof(pData->szOpen), strOpen.GetBuffer());
-			strcpy_s(pData->szHigh, sizeof(pData->szHigh), strHigh.GetBuffer());
-			strcpy_s(pData->szLow, sizeof(pData->szLow), strLow.GetBuffer());
-			strcpy_s(pData->szPriceSell, sizeof(pData->szPriceSell), strPriceSell.GetBuffer());
-			strcpy_s(pData->szPriceBuy, sizeof(pData->szPriceBuy), strPriceBuy.GetBuffer());
-			strcpy_s(pData->szStrength, sizeof(pData->szStrength), strStrength.GetBuffer());
-			pPipe->Send(&packet);
+			::strcpy_s(pData->szStockCode, sizeof(pData->szStockCode), _sRealKey);
+			::strcpy_s(pData->szTime, sizeof(pData->szTime), strTime.GetBuffer());
+			::strcpy_s(pData->szClose, sizeof(pData->szClose), strClose.GetBuffer());
+			::strcpy_s(pData->szVolume, sizeof(pData->szVolume), strVolume.GetBuffer());
+			::strcpy_s(pData->szAccrueVolume, sizeof(pData->szAccrueVolume), strAccrueVolume.GetBuffer());
+			::strcpy_s(pData->szOpen, sizeof(pData->szOpen), strOpen.GetBuffer());
+			::strcpy_s(pData->szHigh, sizeof(pData->szHigh), strHigh.GetBuffer());
+			::strcpy_s(pData->szLow, sizeof(pData->szLow), strLow.GetBuffer());
+			::strcpy_s(pData->szPriceSell, sizeof(pData->szPriceSell), strPriceSell.GetBuffer());
+			::strcpy_s(pData->szPriceBuy, sizeof(pData->szPriceBuy), strPriceBuy.GetBuffer());
+			::strcpy_s(pData->szStrength, sizeof(pData->szStrength), strStrength.GetBuffer());
+			if (pPipe) { pPipe->Send(&packet); }
 			if (pNet->IsConnect())
 			{
 				pNet->Send(_PKT_NET_RECEIVE_TRANSACTION_KIWOOM_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION));
@@ -195,13 +204,13 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 		{
 			패킷헤더포->nRealType = _키움_주식호가잔량_;
 
-			키움_주식호가잔량포 호가잔량포 = (키움_주식호가잔량포)&패킷.bytBuffer[0];
-			strcpy_s(호가잔량포->호가시간, sizeof(호가잔량포->호가시간), GetCommRealData(_sRealData, 21).GetBuffer());
+			키움_주식호가잔량포 호가잔량포 = (키움_주식호가잔량포)&packet.bytBuffer[0];
+			::strcpy_s(호가잔량포->호가시간, sizeof(호가잔량포->호가시간), GetCommRealData(_sRealData, 21).GetBuffer());
 			호가잔량포->매도호가총잔량 = (UINT64)atoi(GetCommRealData(_sRealKey, 121).GetBuffer());
 			호가잔량포->매수호가총잔량 = (UINT64)atoi(GetCommRealData(_sRealKey, 125).GetBuffer());
 
-			패킷.nPacketSize = sizeof(키움_주식호가잔량);
-			pPipe->Send(&패킷);
+			packet.nPacketSize = sizeof(키움_주식호가잔량);
+			if (pPipe) { pPipe->Send(&packet); }
 		}
 		else if (!strcmp(_sRealType, "주식시세"))
 		{
@@ -236,14 +245,14 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			//	s : 선옵 장마감전 동시호가 시작
 			//	e : 선옵 장마감전 동시호가 종료
 
-			키움_장시작시간포 장시작시간포 = (키움_장시작시간포)&패킷.bytBuffer[0];
+			키움_장시작시간포 장시작시간포 = (키움_장시작시간포)&packet.bytBuffer[0];
 			// 구분, 장운영구분(0:장시작전, 2:장종료전 동시호가, 3:장시작, 4: 장종료 예상지수 종료, 8:장종료, 9:장마감)
-			strcpy_s(장시작시간포->장운영구분, sizeof(장시작시간포->장운영구분), GetCommRealData(_sRealKey, 215).GetBuffer());
+			::strcpy_s(장시작시간포->장운영구분, sizeof(장시작시간포->장운영구분), GetCommRealData(_sRealKey, 215).GetBuffer());
 			// 남은시간, 장시작 예상잔여시간
-			strcpy_s(장시작시간포->장시작예상잔여시간, sizeof(장시작시간포->장시작예상잔여시간), GetCommRealData(_sRealKey, 214).GetBuffer());
+			::strcpy_s(장시작시간포->장시작예상잔여시간, sizeof(장시작시간포->장시작예상잔여시간), GetCommRealData(_sRealKey, 214).GetBuffer());
 
-			패킷.nPacketSize = sizeof(키움_장시작시간);
-			pPipe->Send(&패킷);
+			packet.nPacketSize = sizeof(키움_장시작시간);
+			if (pPipe) { pPipe->Send(&packet); }
 			//DBGPRINT("장시작시간 도착 %s / %s", strType, strRemainTime);
 		}
 		
@@ -287,7 +296,7 @@ void C_KH_OPEN_API::OnReceiveConditionVer(long _lRet, LPCSTR _sMsg)	// 조건식
 	//DBGPRINT("C_KH_OPEN_API::OnReceiveConditionVer");
 	try
 	{	// 받은 그대로 
-		PACKET_BASE 패킷 =
+		PACKET_BASE packet =
 		{
 			0
 			, _브릿지패킷_키움_조건식성공_
@@ -296,22 +305,22 @@ void C_KH_OPEN_API::OnReceiveConditionVer(long _lRet, LPCSTR _sMsg)	// 조건식
 		if (1 != _lRet)
 		{	// 사용자 조건검색식 리스트를 얻어오지 못한 경우
 			char szBuffer[(1 << 10)] = { 0 };
-			sprintf_s(szBuffer, "ErrorCode: %d / Message: %s", _lRet, _sMsg);
+			::sprintf_s(szBuffer, "ErrorCode: %d / Message: %s", _lRet, _sMsg);
 
-			패킷.nPacketIndex = _브릿지패킷_키움_조건식실패_;
-			패킷.nPacketSize = (WORD)(strlen(szBuffer) * sizeof(char));
+			packet.nPacketIndex = _브릿지패킷_키움_조건식실패_;
+			packet.nPacketSize = (WORD)(strlen(szBuffer) * sizeof(char));
 			// 버퍼에 복사하고
-			memcpy_s(패킷.bytBuffer, _countof(패킷.bytBuffer), (LPVOID)szBuffer, 패킷.nPacketSize);	// 에러 메시지를 큐에 넣는다.
+			::memcpy_s(packet.bytBuffer, _countof(packet.bytBuffer), (LPVOID)szBuffer, packet.nPacketSize);	// 에러 메시지를 큐에 넣는다.
 		}
 		else
 		{	// 조건식 리스트를 잘 얻어온 경우
 			CStringA strResult = GetConditionNameList();
-			패킷.nPacketIndex = _브릿지패킷_키움_조건식성공_;
-			패킷.nPacketSize = (WORD)(strResult.GetLength() * sizeof(char));
+			packet.nPacketIndex = _브릿지패킷_키움_조건식성공_;
+			packet.nPacketSize = (WORD)(strResult.GetLength() * sizeof(char));
 			// 그대로 복사해서 날린다.
-			memcpy_s(패킷.bytBuffer, _countof(패킷.bytBuffer), (LPVOID)strResult.GetBuffer(), 패킷.nPacketSize);
+			::memcpy_s(packet.bytBuffer, _countof(packet.bytBuffer), (LPVOID)strResult.GetBuffer(), packet.nPacketSize);
 		}
-		pPipe->Send(&패킷);
+		if (pPipe) { pPipe->Send(&packet); }
 	}
 	catch (...)
 	{
@@ -331,25 +340,25 @@ void C_KH_OPEN_API::OnReceiveTrCondition(
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	try
 	{
-		PACKET_BASE pipePacket =
+		PACKET_BASE packet =
 		{
 			0
 			, _브릿지패킷_키움_조건검색받음_
 			, { 0 }
 		};
-		pipePacket.nPacketIndex = _브릿지패킷_키움_조건검색받음_;	// 조건검색 데이터 받음
-		pipePacket.nPacketSize = sizeof(RECIVE_TR_CONDITION_DATA);
+		packet.nPacketIndex = _브릿지패킷_키움_조건검색받음_;	// 조건검색 데이터 받음
+		packet.nPacketSize = sizeof(RECIVE_TR_CONDITION_DATA);
 
-		LPRECIVE_TR_CONDITION_DATA pData = (LPRECIVE_TR_CONDITION_DATA)&pipePacket.bytBuffer[0];
+		LPRECIVE_TR_CONDITION_DATA pData = (LPRECIVE_TR_CONDITION_DATA)&packet.bytBuffer[0];
 
 		pData->nConditionIndex = nIndex;
 		pData->nCountNextData = nNext;
 
-		strcpy_s(pData->szScreenNumber, sizeof(pData->szScreenNumber), _화면번호);
-		strcpy_s(pData->szConditionName, sizeof(pData->szConditionName), strConditionName);
-		strcpy_s(pData->szCodeList, sizeof(pData->szCodeList), strCodeList);
+		::strcpy_s(pData->szScreenNumber, sizeof(pData->szScreenNumber), _화면번호);
+		::strcpy_s(pData->szConditionName, sizeof(pData->szConditionName), strConditionName);
+		::strcpy_s(pData->szCodeList, sizeof(pData->szCodeList), strCodeList);
 
-		pPipe->Send(&pipePacket);
+		if (pPipe) { pPipe->Send(&packet); }
 	}
 	catch (...)
 	{
@@ -367,26 +376,26 @@ void C_KH_OPEN_API::OnReceiveRealCondition(
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	try
 	{
-		PACKET_BASE pipePacket =
+		PACKET_BASE packet =
 		{
 			0
 			, _브릿지패킷_키움_조건검색받음_
 			, { 0 }
 		};
 
-		pipePacket.nPacketIndex = _NET_MSG_KIWOOM_RECIVE_REALTIME_CONDITION_;	// 실시간 조건검색 데이터 받음
-		pipePacket.nPacketSize = sizeof(RECIVE_REALTIME_CONDITION_DATA);
+		packet.nPacketIndex = _NET_MSG_KIWOOM_RECIVE_REALTIME_CONDITION_;	// 실시간 조건검색 데이터 받음
+		packet.nPacketSize = sizeof(RECIVE_REALTIME_CONDITION_DATA);
 
-		LPRECIVE_REALTIME_CONDITION_DATA pData = (LPRECIVE_REALTIME_CONDITION_DATA)&pipePacket.bytBuffer[0];
+		LPRECIVE_REALTIME_CONDITION_DATA pData = (LPRECIVE_REALTIME_CONDITION_DATA)&packet.bytBuffer[0];
 
 		//DBGPRINT("OnReceiveRealCondition() %s / %s / %s / %s", sTrCode, strType, strConditionName, strConditionIndex);
 
 		pData->bInput = ('I' == strType[0]);		// 편입 "I", 이탈 "D", 0x49, 0x44
 		pData->nConditionIndex = ::_ttoi(strConditionIndex);
-		strcpy_s(pData->szStockCode, sizeof(pData->szStockCode), sTrCode);
-		strcpy_s(pData->szConditionName, sizeof(pData->szConditionName), strConditionName);
+		::strcpy_s(pData->szStockCode, sizeof(pData->szStockCode), sTrCode);
+		::strcpy_s(pData->szConditionName, sizeof(pData->szConditionName), strConditionName);
 
-		pPipe->Send(&pipePacket);
+		if (pPipe) { pPipe->Send(&packet); }
 	}
 	catch (...)
 	{	// 큐에 넣지 못했는데 메모리가 터졌다면 

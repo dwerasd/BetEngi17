@@ -18,7 +18,7 @@ namespace net
 	{
 		inet::C_SESSION* pSession;
 		ULONG ulBytesTransferred;
-		BYTE bytBuffer[(1 << 15)];
+		BYTE bytBuffer[(1 << 14)];
 	} RECIVE_DATA, *LPRECIVE_DATA;
 
 	class C_NET_SERVER

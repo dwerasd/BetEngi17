@@ -114,27 +114,22 @@ namespace pipe
 		{
 			if (!bAccept)
 			{
-				if (dk::C_PIPE::Connect(wstrRecv.c_str(), wstrSend.c_str()))
-				{
+				if (!dk::C_PIPE::Connect(wstrRecv.c_str(), wstrSend.c_str()))
+				{	// 접속 실패시 프로그램을 종료하지 않고 접속 시도를 하게 바꿔야한다.
+					//DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다: %x", ulThreadId);
+					//LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
+					//::memset(pNetPacket, 0, sizeof(PACKET_BASE));
+					//pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
+					//theApp.PushReceivePacket(pNetPacket);				// 패킷을 직접 넣고
+					//Send(_브릿지패킷_키움_클라이언트_접속해제_);		// 접속 해제를 날린다.
+					dk::C_PIPE::Destroy();								// 파이프 종료
+				}
+				else
+				{	
 					DBGPRINT("파이프 접속 완료");
 					bAccept = true;
 				}
-				else
-				{
-					DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다: %x", ulThreadId);
-					//AfxMessageBox("파이프 서버에 접속할 수 없습니다");
-					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
-					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
-
-					pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
-					theApp.PushReceivePacket(pNetPacket);				// 패킷을 직접 넣고
-					Send(_브릿지패킷_키움_클라이언트_접속해제_);		// 접속 해제를 날린다.
-
-					dk::C_PIPE::Destroy();								// 파이프 종료
-					bEndPipe = true;
-					break;
-				}
-				dk::멈춰(200);
+				dk::멈춰(500);
 			}
 			else
 			{
@@ -158,7 +153,7 @@ namespace pipe
 					bAccept = false;
 				}
 			}
-		} while (!bEndPipe);
+		} while (true);
 		DSAFE_DELETE(pEventRecv);
 		dk::C_THREAD::Terminate();							// 스레드 강제 종료를 한번 더 날린다.
 		return(0);

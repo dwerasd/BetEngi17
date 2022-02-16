@@ -79,7 +79,7 @@ public:
 	
 	void ReceivePacket(LPNET_PACKET_BUNDLE _pData);
 
-	LPTICK_TRANSACTION_KIWOOM AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData);
+	LPTICK_DATA AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData);
 
 	void ExitProcess() { bExitProcess = true; }
 	void ShowWindow(bool _bShow) { bShowWindow = _bShow; }

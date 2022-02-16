@@ -107,26 +107,26 @@ namespace pipe
 		{
 			if (!bAccept)
 			{
-				if (!Connect(wstrRecv.c_str(), wstrSend.c_str()))
+				if (!dk::C_PIPE::Connect(wstrRecv.c_str(), wstrSend.c_str()))
 				{
-					if (!dk::프로세스체크(L"BetMain.exe"))
-					{
-						DBGPRINT("서버가 실행중이 아닙니다");
-					}
-					DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다");
-					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
-					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
-
-					pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
-					pMain->PushData(pNetPacket);
-					break; 
+					//if (!dk::프로세스체크(L"BetMain.exe"))
+					//{
+					//	DBGPRINT("서버가 실행중이 아닙니다");
+					//}
+					//DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다");
+					//LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
+					//::memset(pNetPacket, 0, sizeof(PACKET_BASE));
+					//pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
+					//pMain->PushData(pNetPacket);
+					//break; 
+					dk::C_PIPE::Destroy();								// 파이프 종료
 				}
 				else
 				{
 					DBGPRINT("파이프 접속 완료");
 					bAccept = true;
 				}
-				dk::멈춰(200);
+				dk::멈춰(500);
 			}
 			else
 			{

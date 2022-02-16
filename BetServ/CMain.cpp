@@ -67,10 +67,10 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 				::strftime(날짜버퍼, _countof(날짜버퍼), "%Y%m%d", &t);		// "20201215", 오늘 날짜 저장용
 
 				저장경로 += 날짜버퍼;
-				저장경로 += ".tickiw";
+				저장경로 += ".tick";
 				for (size_t i = 0; i < pMain->nCountAccrueTick; i++)
 				{
-					LPTICK_TRANSACTION_KIWOOM pData = (LPTICK_TRANSACTION_KIWOOM)(pMain->pTickBuffer + (sizeof(TICK_TRANSACTION_KIWOOM) * i));
+					LPTICK_DATA pData = (LPTICK_DATA)(pMain->pTickBuffer + (sizeof(TICK_DATA) * i));
 					//sprintf_s(szTime, "%08x", pData->nTime);
 					// 모든 체결 데이터 endian 을 변경한다
 					dk::ntohl(pData->nTime);
@@ -285,7 +285,7 @@ long C_MAIN::Calculate()
 		nFrame++;
 		if (!bHighPerformance)
 		{
-			dk::멈춰();
+			dk::멈춰();			// 약 000~015 밀리초 지연
 		}
 	} while (false);
 	return(nResult);
@@ -368,13 +368,13 @@ void C_MAIN::ReceivePacket(LPNET_PACKET_BUNDLE _pData)
 	queueNetworkPackets.enqueue(_pData);
 }
 
-LPTICK_TRANSACTION_KIWOOM C_MAIN::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
+LPTICK_DATA C_MAIN::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 {	// 일단 틱 데이터를 연속된 메모리에 변환해서 쌓는다.
-	LPTICK_TRANSACTION_KIWOOM pTickData = nullptr;
+	LPTICK_DATA pTickData = nullptr;
 	if (pTickBuffer)
 	{
-		pTickData = (LPTICK_TRANSACTION_KIWOOM)pTickBufferPtr;
-		pTickData->clear();
+		pTickData = (LPTICK_DATA)pTickBufferPtr;
+		::memset(pTickData, 0, sizeof(TICK_DATA));
 
 		pTickData->nSequence = nCountAccrueTick++;	// 더하고 증가, 순서는 0부터 기록한다.
 		// 코드는 복사, 7바이트 문자배열이라 제로 메모리는 굳이 안쓴다.
@@ -412,13 +412,12 @@ LPTICK_TRANSACTION_KIWOOM C_MAIN::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pDat
 		}
 		// 부호가 붙어 있으면 무시하고 숫자만 변환
 		pTickData->fPrice = (float)dk::atoi_s(_pData->szClose);
-		pTickData->nTransVolume = (float)dk::atoi_s(_pData->szVolume);
-		pTickData->nAccrueVolume = (float)dk::atoi_s(_pData->szAccrueVolume);
+		pTickData->nTransVolume = dk::atoi_s(_pData->szVolume);
+		pTickData->nAccrueVolume = dk::atoi_s(_pData->szAccrueVolume);
 		pTickData->최우선매도호가 = (float)dk::atoi_s(_pData->szPriceSell);
 		pTickData->최우선매수호가 = (float)dk::atoi_s(_pData->szPriceBuy);
-		pTickData->키움강도 = (float)dk::atoi_s(_pData->szStrength);
 		//디뷰("%d / %d", pTickData->nTransVolume, pTickData->nAccrueVolume);	// 왜 이걸 안쓰면 누락이 발생하는거지
-		pTickBufferPtr += sizeof(TICK_TRANSACTION_KIWOOM);	// 채운만큼 포인터 이동
+		pTickBufferPtr += sizeof(TICK_DATA);	// 채운만큼 포인터 이동
 	}
 	return(pTickData);
 }
@@ -431,15 +430,15 @@ DWORD C_MAIN::ThreadFunc(LPVOID _pParam)
 	{
 		pNet = new net::C_NET_SERVER(this);
 	}
-	pNet->SetValueWorkerThread(2);
+	pNet->SetValueWorkerThread(1);
 	pNet->ThreadStart();
 	pNet->StartAcceptingConnections();
 	DBGPRINT("C_NET_SERVER::ThreadFunc() - 네트워크 접속 처리 스레드 생성");
 
 	nCountAccrueTick = 0;
 	힙해제(pTickBuffer);
-	pTickBuffer = pTickBufferPtr = (LPBYTE)힙할당(sizeof(TICK_TRANSACTION_KIWOOM) * 40000000);
-	디뷰("sizeof(체결틱): %d / 힙크기(pTickBuffer): %zd", sizeof(TICK_TRANSACTION_KIWOOM), 힙크기(pTickBuffer));
+	pTickBuffer = pTickBufferPtr = (LPBYTE)힙할당(sizeof(TICK_DATA) * 40000000);
+	디뷰("sizeof(체결틱): %d / 힙크기(pTickBuffer): %zd", sizeof(TICK_DATA), 힙크기(pTickBuffer));
 
 	힙해제(pTickBufferEBest);
 

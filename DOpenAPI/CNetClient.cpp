@@ -56,10 +56,7 @@ namespace net
 
 			Send(_PKT_NET_CONNECTED_);
 			디뷰("C_NET_CLIENT::Connect() - 성공");
-		}
-		else
-		{
-			디뷰("C_NET_CLIENT::Connect() - 실패: %d", nResult);
+			bAccept = true;
 		}
 		return(nResult);
 	}
@@ -71,6 +68,7 @@ namespace net
 			::closesocket(nSocket);
 			nSocket = INVALID_SOCKET;
 		}
+		bAccept = false;
 	}
 
 	void C_NET_CLIENT::Send(WORD _nIndex, LPBYTE _pData, WORD _nSize)
@@ -94,40 +92,52 @@ namespace net
 			DBGPRINT("[ENGINE] 받음: %i / %s, 이벤트를 생성한다", nReciveSize, (bytRecvBuf + sizeof(PACKET_HEADER)));
 			// 사실 처리할 패킷은 없다. 보내기만 할꺼니까.
 
-
 		}
 		catch (...)
 		{
-
+			디뷰위치();
 		}
+		DSAFE_DELETE(pNetPacketBundle);	// 이 함수를 호출하면 nullptr 로 수정하기 때문에 이 함수에서 해제해야한다.
 		return(0);
 	}
 
 	DWORD C_NET_CLIENT::ThreadFunc(LPVOID _lpParam)
 	{
 		_lpParam;
-		if (!Connect(szRemoteAddress, nPort))
+		//CMDPRINT(_T("C_NET_CLIENT::ThreadFunc(0)"));
+		do
 		{
-			//CMDPRINT(_T("C_NET_CLIENT::ThreadFunc(0)"));
-			do
+			try
 			{
-				BYTE bytRecvBuf[(1 << 13)] = { 0 };
-				try
+				if (!bAccept)
+				{
+					if (!Connect(szRemoteAddress, nPort))
+					{
+						bAccept = true;
+					}
+					else
+					{
+						DSAFE_DELETE(pNetPacketBundle);
+					}
+					dk::멈춰(500);
+				}
+				else
 				{
 					if (INVALID_SOCKET != nSocket)
 					{
-						WORD nReciveSize = (WORD)::recv(nSocket, (char*)bytRecvBuf, sizeof(bytRecvBuf), 0);
+						BYTE bytRecvBuf[(1 << 14)] = { 0 };
+						int nReciveSize = ::recv(nSocket, (char*)bytRecvBuf, sizeof(bytRecvBuf), 0);
 						// 메시지가 들어오면
 						if (0 < nReciveSize)
 						{
 							LPBYTE _pBuffer = &bytRecvBuf[0];
-							WORD nCopySize = 0, nCopied = 0;
+							int nCopySize = 0, nCopied = 0;
 							do
 							{
 								if (pNetPacketBundle)		// 처리 안된 패킷이 있나?
 								{
 									// 채워야할크기 = 총크기 - 보관중인크기
-									WORD nRemainSize = pNetPacketBundle->nBytesPacket - pNetPacketBundle->nBytesTransferred;
+									short nRemainSize = pNetPacketBundle->nBytesPacket - pNetPacketBundle->nBytesTransferred;
 									// 복사할크기 = 받은크기가 남은크기보다 작으면 받은크기, 아니면 남은크기만큼 복사해서 완성하자.
 									nCopySize = (nReciveSize < nRemainSize) ? nReciveSize : nRemainSize;
 								}
@@ -144,13 +154,13 @@ namespace net
 								if (((_MAX_PACKET_SIZE_ - _ALIGNMENT_) - (WORD)pNetPacketBundle->nBytesTransferred) >= nCopySize)
 								{
 									// 받은 내용에서 완성 될 만큼만 복사 ( 받아둔 크기를 더하고 빼는데 없으면 그냥 0 이다 )
-									memcpy_s(pNetPacketBundle->bytBuffer + pNetPacketBundle->nBytesTransferred
+									::memcpy_s(pNetPacketBundle->bytBuffer + pNetPacketBundle->nBytesTransferred
 										, _countof(pNetPacketBundle->bytBuffer) - pNetPacketBundle->nBytesTransferred
 										, _pBuffer + nCopied	// 처음에는 그냥 0 이다. 근데 다음번에 들어오게 되면 복사한 다음 위치이다.
 										, nCopySize	// 완성 안될거 같으면 받은크기, 완성될거 같으면 딱 채울만큼 복사한다.
 									);
 									// 복사한만큼 더하면 이게 보관중인크기가 되는거다.
-									pNetPacketBundle->nBytesTransferred += nCopySize;
+									pNetPacketBundle->nBytesTransferred += (WORD)nCopySize;
 									// 패킷이 완성되었는가?
 									if (pNetPacketBundle->nBytesPacket == pNetPacketBundle->nBytesTransferred)
 									{
@@ -166,7 +176,6 @@ namespace net
 								{
 									DSAFE_DELETE(pNetPacketBundle);
 									Disconnect();
-									break;
 								}
 							} while (0 < nReciveSize);		// 받은크기가 남았는가?
 						}
@@ -178,19 +187,18 @@ namespace net
 					}
 					else // if (INVALID_SOCKET != nSocket)
 					{
-						if (INVALID_SOCKET == nSocket)
-						{
-							Connect(szRemoteAddress, nPort);	// 재접속 시도.
-						}
+						DSAFE_DELETE(pNetPacketBundle);
+						bAccept = false;
 					}
 				}
-				catch (...)
-				{
-					DSAFE_DELETE(pNetPacketBundle);
-					Disconnect();
-				}
-			} while (TRUE);
-		}
+			}
+			catch (...)
+			{
+				디뷰위치();
+				DSAFE_DELETE(pNetPacketBundle);
+				Disconnect();
+			}
+		} while (true);
 		return(0);
 	}
 }

@@ -31,6 +31,7 @@ namespace net
 		, public dk::C_THREAD
 	{
 	private:
+		bool bAccept{ false };
 		SOCKET nSocket{ INVALID_SOCKET };
 
 		WORD nPort{ 0 };

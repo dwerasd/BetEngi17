@@ -116,23 +116,17 @@ namespace pipe
 		{
 			if (!bAccept)
 			{
-				if (FALSE != Connect(wstrRecv.c_str(), wstrSend.c_str()))
+				if (!dk::C_PIPE::Connect(wstrRecv.c_str(), wstrSend.c_str()))
+				{
+					dk::C_PIPE::Destroy();								// 파이프 종료
+					
+				}
+				else
 				{
 					DBGPRINT("파이프 접속 완료");
 					bAccept = true;
 				}
-				else
-				{
-					DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다");
-					//MessageBox(0, __TEXT("파이프 서버에 접속할 수 없습니다"), __TEXT("알림"), MB_OK);
-					LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
-					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
-
-					pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
-					pMain->PushData(pNetPacket);
-					break;
-				}
-				dk::Sleep(200);
+				dk::Sleep(500);
 			}
 			else
 			{
@@ -158,6 +152,7 @@ namespace pipe
 			}
 		} while (true);
 		DSAFE_DELETE(pEventRecv);
+		dk::C_THREAD::Terminate();							// 스레드 강제 종료를 한번 더 날린다.
 		return(0);
 	}
 }

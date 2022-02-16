@@ -76,6 +76,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_서버", "_서버", "{A24C
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BetServ", "BetServ\BetServ.vcxproj", "{C74EE84F-B142-4221-A08A-BCFD535629E7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TickMem", "TickMem\TickMem.vcxproj", "{1CEB39A3-18AB-4304-A552-9D58BAE33018}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug (static runtime)|x64 = Debug (static runtime)|x64
@@ -338,6 +340,22 @@ Global
 		{C74EE84F-B142-4221-A08A-BCFD535629E7}.Release|x64.Build.0 = Release|x64
 		{C74EE84F-B142-4221-A08A-BCFD535629E7}.Release|x86.ActiveCfg = Release|Win32
 		{C74EE84F-B142-4221-A08A-BCFD535629E7}.Release|x86.Build.0 = Release|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug (static runtime)|x64.ActiveCfg = Debug|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug (static runtime)|x64.Build.0 = Debug|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug (static runtime)|x86.ActiveCfg = Debug|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug (static runtime)|x86.Build.0 = Debug|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug|x64.ActiveCfg = Debug|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug|x64.Build.0 = Debug|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug|x86.ActiveCfg = Debug|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Debug|x86.Build.0 = Debug|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release (static runtime)|x64.ActiveCfg = Release|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release (static runtime)|x64.Build.0 = Release|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release (static runtime)|x86.ActiveCfg = Release|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release (static runtime)|x86.Build.0 = Release|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release|x64.ActiveCfg = Release|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release|x64.Build.0 = Release|x64
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release|x86.ActiveCfg = Release|Win32
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -362,6 +380,7 @@ Global
 		{ABAECDA8-4FCD-44D8-9781-5E6D64058F3B} = {21094028-EA08-42C4-977D-6533478E96DC}
 		{A24C973D-E5C0-479E-95C0-C7291695DDDE} = {0434417C-B0EB-40CF-8EB3-10F705C66387}
 		{C74EE84F-B142-4221-A08A-BCFD535629E7} = {A24C973D-E5C0-479E-95C0-C7291695DDDE}
+		{1CEB39A3-18AB-4304-A552-9D58BAE33018} = {A24C973D-E5C0-479E-95C0-C7291695DDDE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F84A900-97A2-4709-BA44-50D155F8789B}

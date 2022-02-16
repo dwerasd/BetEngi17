@@ -19,7 +19,7 @@ namespace pipe
 		, public dk::C_THREAD
 	{
 	private:
-		bool bAccept{ false }, bEndPipe{ false };
+		bool bAccept{ false };
 		dk::C_EVENT* pEventRecv;
 
 		std::wstring wstrRecv;
