@@ -910,7 +910,9 @@ long C_MAIN::캔들받아서리턴(std::vector<확장캔들포>& _리턴벡터, 
 		if (_새로요청)
 		{	// 첫 요청이면 요청사항을 세팅한다.
 			pStockChart->SetInputValue(0, _종목코드);									// 종목코드, "U001" 코스피, "U201" 코스닥
-			pStockChart->SetInputValue(1, (char)'2');									// [2]: 갯수로 요청
+			pStockChart->SetInputValue(1, (char)'2');									// [1]: 기간으로 요청, [2]: 갯수로 요청 - 기간 요청시 주,월,분,틱은 불가
+			//pStockChart->SetInputValue(2, );											// 종료일
+			//pStockChart->SetInputValue(3, );											// 시작일
 			pStockChart->SetInputValue(4, (ULONG)99999999);								// 최근 390개의 봉
 			pStockChart->SetInputValue(7, (USHORT)_캔들의길이);							// [1]: 1분봉, [15]: 15분봉
 			//디뷰("[%d/%d] 파일경로: %s / 갯수로 요청 %c", nRemainRequestCount, pCybos->LimitRequestRemainTime, szSavePath, cRequestType);

@@ -480,7 +480,7 @@ typedef struct _TICK_DATA
 //	float nAccrueVolume;		// 누적거래량
 //	float 최우선매도호가;		// 체결량
 //	float 최우선매수호가;		// 체결량
-//} TICK_DATA, *LPTICK_DATA;
+//} TICK_DATAF, *LPTICK_DATAF;
 
 typedef struct _TICK_TRANSACTIONF
 {	// 저장할 버퍼

@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="기본">
+      <UniqueIdentifier>{35a91a80-4bc9-4a76-abfa-959dc86019bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="기본\헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="기본\소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="기본\리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="통신">
+      <UniqueIdentifier>{eed7a208-58d1-447c-9750-7440808e58ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\파이프">
+      <UniqueIdentifier>{964c1a7f-76e9-43a0-be83-ad399ee61338}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임">
+      <UniqueIdentifier>{547e1068-610f-4d2f-b868-a50de13ba541}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Define">
+      <UniqueIdentifier>{ad3d8d64-2b0a-4162-939d-03c953204ca6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="설정">
+      <UniqueIdentifier>{9a78edd2-a349-481e-a9b5-a50ce9b9d930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="데이터베이스">
+      <UniqueIdentifier>{b22686ce-2cdf-4961-8284-0b33fd7121e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="기본\오더처리">
+      <UniqueIdentifier>{e3a6ec72-956b-4cd6-ba50-09f587ca4d46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\네트워크">
+      <UniqueIdentifier>{012ea679-0ed0-4e52-8ac7-c49cfac478d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\엔진">
+      <UniqueIdentifier>{e82298c5-fee4-45ca-994a-e3fc75938845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임\엔진">
+      <UniqueIdentifier>{5e7f0947-5126-44a6-8e90-78c5c230ddde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="증권사">
+      <UniqueIdentifier>{21bd3478-ed21-417f-a193-55023b289976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="증권사\키움">
+      <UniqueIdentifier>{e13a3d10-3f2f-4c4e-b97a-b2474eb2d635}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="증권사\이베스트">
+      <UniqueIdentifier>{a9344467-7cb4-4414-b6f5-7e8e00a1cfd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="증권사\브릿지베이스">
+      <UniqueIdentifier>{a8aa548c-1829-4dd2-99a9-0020f7b04c56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임\오브젝트">
+      <UniqueIdentifier>{4f2a7d4b-2c9f-4ea6-9a18-11f3ee7bd97f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임\오브젝트\몬스터">
+      <UniqueIdentifier>{d5773520-b5b9-4c68-a769-29632a858236}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임\오브젝트\기준">
+      <UniqueIdentifier>{bab3f453-4584-46e6-8b3b-c9ca29a8e5b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임\오브젝트\기준_능동">
+      <UniqueIdentifier>{4ef59494-0e13-4dff-bce0-0c30d1d00d67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="게임\오브젝트\기준_수동">
+      <UniqueIdentifier>{ff9a828f-f9e0-49f8-bd6d-3f58711aee1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="기본\소스 파일\브릿지">
+      <UniqueIdentifier>{9c31d5d6-ed28-4508-98cd-6fe794b2a843}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CMain.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Defines\NetworkDef.h">
+      <Filter>통신</Filter>
+    </ClInclude>
+    <ClInclude Include="CPipeServer.h">
+      <Filter>통신\파이프</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Defines\DataDef.h">
+      <Filter>Define</Filter>
+    </ClInclude>
+    <ClInclude Include="CConfig.h">
+      <Filter>설정</Filter>
+    </ClInclude>
+    <ClInclude Include="CDatabase.h">
+      <Filter>데이터베이스</Filter>
+    </ClInclude>
+    <ClInclude Include="COrder.h">
+      <Filter>기본\오더처리</Filter>
+    </ClInclude>
+    <ClInclude Include="GameDef.h">
+      <Filter>게임</Filter>
+    </ClInclude>
+    <ClInclude Include="CNetServer.h">
+      <Filter>통신\네트워크</Filter>
+    </ClInclude>
+    <ClInclude Include="CNetEngine.h">
+      <Filter>통신\엔진</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Defines\XingDef.h">
+      <Filter>Define</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Defines\XingDef_t0424.h">
+      <Filter>Define</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStruct.h">
+      <Filter>게임\엔진</Filter>
+    </ClInclude>
+    <ClInclude Include="CBridgeBase.h">
+      <Filter>증권사\브릿지베이스</Filter>
+    </ClInclude>
+    <ClInclude Include="CBridgeKiwoom.h">
+      <Filter>증권사\키움</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameEngine.h">
+      <Filter>게임\엔진</Filter>
+    </ClInclude>
+    <ClInclude Include="CObjectBase.h">
+      <Filter>게임\오브젝트\기준</Filter>
+    </ClInclude>
+    <ClInclude Include="CObjectBaseActive.h">
+      <Filter>게임\오브젝트\기준_능동</Filter>
+    </ClInclude>
+    <ClInclude Include="CObjectBasePassive.h">
+      <Filter>게임\오브젝트\기준_수동</Filter>
+    </ClInclude>
+    <ClInclude Include="CObjectMonster.h">
+      <Filter>게임\오브젝트\몬스터</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="BetMain.rc">
+      <Filter>기본\리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+    <Image Include="BetMain.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CPipeServer.cpp">
+      <Filter>통신\파이프</Filter>
+    </ClCompile>
+    <ClCompile Include="CConfig.cpp">
+      <Filter>설정</Filter>
+    </ClCompile>
+    <ClCompile Include="CDatabase.cpp">
+      <Filter>데이터베이스</Filter>
+    </ClCompile>
+    <ClCompile Include="COrder.cpp">
+      <Filter>기본\오더처리</Filter>
+    </ClCompile>
+    <ClCompile Include="CNetServer.cpp">
+      <Filter>통신\네트워크</Filter>
+    </ClCompile>
+    <ClCompile Include="CNetEngine.cpp">
+      <Filter>통신\엔진</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStruct.cpp">
+      <Filter>게임</Filter>
+    </ClCompile>
+    <ClCompile Include="CBridgeBase.cpp">
+      <Filter>증권사\브릿지베이스</Filter>
+    </ClCompile>
+    <ClCompile Include="CBridgeKiwoom.cpp">
+      <Filter>증권사\키움</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainDropFile.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainWin32Object.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainImGuiPopup.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CGameEngine.cpp">
+      <Filter>게임\엔진</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjectBase.cpp">
+      <Filter>게임\오브젝트\기준</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjectBaseActive.cpp">
+      <Filter>게임\오브젝트\기준_능동</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjectBasePassive.cpp">
+      <Filter>게임\오브젝트\기준_수동</Filter>
+    </ClCompile>
+    <ClCompile Include="CObjectMonster.cpp">
+      <Filter>게임\오브젝트\몬스터</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainEBest.cpp">
+      <Filter>기본\소스 파일\브릿지</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainKiwoom.cpp">
+      <Filter>기본\소스 파일\브릿지</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainCreon.cpp">
+      <Filter>기본\소스 파일\브릿지</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
