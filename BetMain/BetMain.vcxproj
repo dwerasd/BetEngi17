@@ -117,22 +117,10 @@
     <ClCompile Include="CDatabase.cpp" />
     <ClCompile Include="CMainDropFile.cpp" />
     <ClCompile Include="CMainWin32Object.cpp" />
-    <ClCompile Include="CNetEngine.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="CNetServer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="CObjectBaseActive.cpp" />
     <ClCompile Include="CObjectBasePassive.cpp" />
     <ClCompile Include="COrder.cpp" />
     <ClCompile Include="CMainImGuiPopup.cpp" />
-    <ClInclude Include="CNetEngine.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="CNetServer.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="CObjectBasePassive.h" />
     <ClInclude Include="GameDef.h" />
     <ClInclude Include="CBridgeKiwoom.h" />

@@ -37,12 +37,6 @@
     <Filter Include="기본\오더처리">
       <UniqueIdentifier>{e3a6ec72-956b-4cd6-ba50-09f587ca4d46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="통신\네트워크">
-      <UniqueIdentifier>{012ea679-0ed0-4e52-8ac7-c49cfac478d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="통신\엔진">
-      <UniqueIdentifier>{e82298c5-fee4-45ca-994a-e3fc75938845}</UniqueIdentifier>
-    </Filter>
     <Filter Include="게임\엔진">
       <UniqueIdentifier>{5e7f0947-5126-44a6-8e90-78c5c230ddde}</UniqueIdentifier>
     </Filter>
@@ -111,12 +105,6 @@
     <ClInclude Include="GameDef.h">
       <Filter>게임</Filter>
     </ClInclude>
-    <ClInclude Include="CNetServer.h">
-      <Filter>통신\네트워크</Filter>
-    </ClInclude>
-    <ClInclude Include="CNetEngine.h">
-      <Filter>통신\엔진</Filter>
-    </ClInclude>
     <ClInclude Include="..\Defines\XingDef.h">
       <Filter>Define</Filter>
     </ClInclude>
@@ -176,12 +164,6 @@
     </ClCompile>
     <ClCompile Include="COrder.cpp">
       <Filter>기본\오더처리</Filter>
-    </ClCompile>
-    <ClCompile Include="CNetServer.cpp">
-      <Filter>통신\네트워크</Filter>
-    </ClCompile>
-    <ClCompile Include="CNetEngine.cpp">
-      <Filter>통신\엔진</Filter>
     </ClCompile>
     <ClCompile Include="GameStruct.cpp">
       <Filter>게임</Filter>

@@ -302,6 +302,35 @@ typedef struct _BET_STICK_EX
 #endif
 } BET_STICK_EX, *LPBET_STICK_EX, 확장캔들, *확장캔들포;			// 28 + 56 = 84 바이트, 더미포함하면 128바이트
 
+
+typedef struct _STICKS_HEADER
+{
+	char 크레온코드[8];			// 크레온코드
+	char 플코드[13];			// 풀코드
+	ULONG nStickType;		// [0]: 분봉, [1]: 일봉, [2]: 주봉, [3]: 월봉, [4]: 틱봉
+	ULONG nStickLength;		// [1]: 1분봉, [3]: 3분봉
+	ULONG nMaxSticks;		// 캔들 최대 갯수
+	ULONG nCountSticks;		// 기록된 캔들의 갯수
+} STICKS_HEADER, *LPSTICKS_HEADER;
+
+typedef struct _STICK_DATAF
+{
+	ULONG nDate;							// 날짜
+	ULONG nTime;							// 시간
+	float fOpen;							// 시가
+	float fHigh;							// 고가
+	float fLow;							// 저가
+	float fClose;							// 종가(현재가)
+	ULONG nTotalVolume;						// 거래량
+	ULONG 누적매수체결량;					// 누적매수거래량, 체결 데이터에서 합산하면 되고, 분봉은 크레온에서 준다.ㅏ
+	ULONG 누적매도체결량;				// 누적매도거래량, 체결 데이터에서 합산하면 되고, 분봉은 크레온에서 준다.ㅏ
+	ULONG 고가시간;
+	ULONG 저가시간;
+	float 매수평균가;
+	float 매도평균가;
+} STICK_DATAF, *LPSTICK_DATAF;		// 28 바이트
+
+
 typedef struct _BET_INDICATOR
 {
 	//pine_swma(x) => x[3] * 1 / 6 + x[2] * 2 / 6 + x[1] * 2 / 6 + x[0] * 1 / 6
