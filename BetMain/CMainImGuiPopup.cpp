@@ -547,7 +547,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				::time_t tToday = ::time(0);		// 오늘 날짜를 구함
 				::tm t;
 				::localtime_s(&t, &tToday);
-				::strftime(날짜버퍼, _countof(날짜버퍼), "%Y%m%d", &t);		// "20201215", 오늘 날짜 저장용
+				::strftime(날짜버퍼, _countof(날짜버퍼), "%Y%m%d", &t);		// "202202218", 오늘 날짜 저장용
 
 				저장경로 += 날짜버퍼;
 				저장경로 += ".tic";
@@ -558,11 +558,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 					// 모든 체결 데이터 endian 을 변경한다
 					dk::ntohl(pData->nTime);
 				}
-#if defined(_CHECK_PERFORMANCE_)
-				DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료. %0.6f", nAccrueTickCount, timerPerformance[0].TimeLeft());
-#else
 				DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pGame->nCountAccrueTick);
-#endif
 				size_t nSaveSize = (pGame->pTickBufferPtr - pGame->pTickBuffer);
 				dk::C_FILE whiteFile(저장경로
 					, GENERIC_WRITE																// 쓰기만할꺼고
@@ -572,13 +568,8 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				);
 				
 				whiteFile.Write(pGame->pTickBuffer, (ULONG)nSaveSize);
-#if defined(_CHECK_PERFORMANCE_)
-				DBGPRINT("[ENGINE] 총 %d 개 쓰기 완료 %0.6f", nAccrueTickCount, timerPerformance[0].TimeLeft());
-#else
 				DBGPRINT("[ENGINE] 총 %d 개 쓰기 완료", pGame->nCountAccrueTick);
-#endif
 				whiteFile.Destroy();
-
 			}
 			static size_t nCountCreonObjects = 0;
 			if (!nCountCreonObjects)

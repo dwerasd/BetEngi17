@@ -51,6 +51,9 @@
     <ClInclude Include="..\Defines\NetworkDef.h">
       <Filter>통신</Filter>
     </ClInclude>
+    <ClInclude Include="..\Defines\DataDef.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">

@@ -111,8 +111,9 @@ private:
 
 	LPSTR 캔들경로세팅(LPSTR _경로포인터, size_t _경로버퍼크기, BYTE _캔들의종류, WORD _캔들의길이 = 1);
 	void 캔들요청세팅(LPCSTR _종목코드, BYTE _캔들의종류, WORD _캔들의길이);
+#if 0
 	long 캔들받아서리턴(std::vector<확장캔들포>& _리턴벡터, LPCSTR _종목코드, BYTE _캔들의종류, WORD _캔들의길이, bool _새로요청 = false);
-
+#endif
 	bool 장중인가();
 	void 종목갱신(LPCSTR _종목코드, 바이트 _캔들종류, 워드 _캔들길이);
 	void 캔들갱신();

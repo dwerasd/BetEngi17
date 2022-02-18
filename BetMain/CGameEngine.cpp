@@ -207,7 +207,7 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 
 		pTickData->nSequence = nCountAccrueTick++;	// 더하고 증가, 순서는 0부터 기록한다.
 		// 코드는 복사, 7바이트 문자배열이라 제로 메모리는 굳이 안쓴다.
-		strncpy_s(pTickData->szCode, 배열크기(pTickData->szCode) * sizeof(char), _pData->szStockCode, 6);
+		::strncpy_s(pTickData->szCode, 배열크기(pTickData->szCode) * sizeof(char), _pData->szStockCode, 6);
 		pTickData->szCode[6] = 0;
 		// 이 함수가 호출된 시스템 시간을 얻어온다.
 		dk::DLOCAL_TIME currentTime;
@@ -216,7 +216,7 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 		// 아직 저장할게 아니니까 endian 변환은 하지 않는다.
 		//sprintf_s(szTime, "%08x", (::atoi(_szTime) * 1000) + cur_time.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
 		//pTickData->nTime = ::ntohl(::strtol(szTime, NULL, 16));
-		sprintf_s(szTime, "%d", (::atoi(_pData->szTime) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
+		::sprintf_s(szTime, "%d", (::atoi(_pData->szTime) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
 		pTickData->nTime = ::atoi(szTime);
 
 		// 매수 매도인지 여기서 판단 후에 종목에 넘겨주도록 하자.

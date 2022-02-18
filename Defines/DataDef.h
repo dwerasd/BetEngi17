@@ -302,11 +302,13 @@ typedef struct _BET_STICK_EX
 #endif
 } BET_STICK_EX, *LPBET_STICK_EX, 확장캔들, *확장캔들포;			// 28 + 56 = 84 바이트, 더미포함하면 128바이트
 
-
+///////////////////////////////////////////////////////////////////////////////
+// 나눠진 파일을 하나로 합친다.
+// 준비할 때는 일단 읽어서 필요없는 종목데이터는 버리면 된다.
+// 파일을 드래그 했을 때 없으면 추가하고 있으면 데이터영역만 덮어씌우도록 한다.
 typedef struct _STICKS_HEADER
 {
-	char 크레온코드[8];			// 크레온코드
-	char 플코드[13];			// 풀코드
+	char 크레온코드[8];		// 크레온코드
 	ULONG nStickType;		// [0]: 분봉, [1]: 일봉, [2]: 주봉, [3]: 월봉, [4]: 틱봉
 	ULONG nStickLength;		// [1]: 1분봉, [3]: 3분봉
 	ULONG nMaxSticks;		// 캔들 최대 갯수
@@ -315,21 +317,25 @@ typedef struct _STICKS_HEADER
 
 typedef struct _STICK_DATAF
 {
-	ULONG nDate;							// 날짜
-	ULONG nTime;							// 시간
-	float fOpen;							// 시가
-	float fHigh;							// 고가
+	ULONG nDate;						// 날짜
+	ULONG nTime;						// 시간
+	float fOpen;						// 시가
+	float fHigh;						// 고가
 	float fLow;							// 저가
-	float fClose;							// 종가(현재가)
-	ULONG nTotalVolume;						// 거래량
-	ULONG 누적매수체결량;					// 누적매수거래량, 체결 데이터에서 합산하면 되고, 분봉은 크레온에서 준다.ㅏ
+	float fClose;						// 종가(현재가)
+	ULONG nTotalVolume;					// 거래량
+	ULONG 누적매수체결량;				// 누적매수거래량, 체결 데이터에서 합산하면 되고, 분봉은 크레온에서 준다.ㅏ
 	ULONG 누적매도체결량;				// 누적매도거래량, 체결 데이터에서 합산하면 되고, 분봉은 크레온에서 준다.ㅏ
 	ULONG 고가시간;
 	ULONG 저가시간;
 	float 매수평균가;
 	float 매도평균가;
 } STICK_DATAF, *LPSTICK_DATAF;		// 28 바이트
-
+// size_t nSizeContent = sizeof(STICK_DATAF) * nCountSticks;
+// size_t nSizeSticks = sizeof(STICKS_HEADER) + (sizeof(STICK_DATAF) * nCountSticks);
+// 버퍼포인터 += sizeof(STICK_DATAF) 이렇게 해도 되고 
+// 캔들포인터 = (LPSTICK_DATAF)버퍼포인터; 캔들포인터[0] ~ 캔들포인터[nCountSticks-1] 이렇게 써도 되고
+///////////////////////////////////////////////////////////////////////////////
 
 typedef struct _BET_INDICATOR
 {

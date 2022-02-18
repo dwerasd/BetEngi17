@@ -18,6 +18,8 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 	DWORD dwResult = 0;
 	C_GAME* pGame = (C_GAME::GetInstance());
 	디뷰("C_FILE_HANDLER::ThreadFunc(start)");
+	static LPBYTE pStickBuffer = (LPBYTE)힙할당((sizeof(STICKS_HEADER) + ((sizeof(STICK_DATAF) * 500)) * 3000));
+	static LPBYTE pStickBufferPtr = pStickBuffer;
 	do
 	{
 		LPSTR pPath = nullptr;
@@ -27,11 +29,11 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 			if (pPath)
 			{
 				char szPath[_MAX_PATH] = { 0 };
-				strcpy_s(szPath, pPath);
+				::strcpy_s(szPath, pPath);
 
 				char szExt[(1 << 5)] = { 0 };
-				strcpy_s(szExt, ::strrchr(szPath, '.') + 1);	// 확장자만 따오고
-				if (!strcmp(szExt, "txt"))
+				::strcpy_s(szExt, ::strrchr(szPath, '.') + 1);	// 확장자만 따오고
+				if (!::strcmp(szExt, "txt"))
 				{	// 텍스트 파일이면
 					dk::C_FILE file(szPath);
 					char szLine[(1 << 10)] = { 0 };
@@ -100,7 +102,7 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 					} while (true);
 					//DBGPRINT("총 체결 건수: %d", dwResult);
 				}
-				else if (!strcmp(szExt, "tic") || !strcmp(szExt, "tick"))
+				else if (!::strcmp(szExt, "tic") || !::strcmp(szExt, "tick"))
 				{
 					dk::C_FILE file(szPath);
 					//KIWOOM_REALDATA_TRANSACTION data;
@@ -118,20 +120,41 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 					디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());
 				}
 				else if (!strcmp(szExt, "bet"))
-				{
+				{	// 여기서는 기록만 한다.
 					dk::C_FILE file(szPath);
 					//KIWOOM_REALDATA_TRANSACTION data;
-					LPBYTE pBuffer = file.GetFileData();
-					size_t 갯수 = file.GetReadSize() / sizeof(TICK_DATA);
-					디뷰("체결틱갯수: %d", 갯수);
 					퍼포먼스타이머.시작();
-					for (size_t i = 0; i < 갯수; i++)
-					{
-						LPTICK_DATA pTick = (LPTICK_DATA)pBuffer;
-						dk::ntohl(pTick->nTime);
-						pGame->PushTickData(pTick);
-						pBuffer += sizeof(TICK_DATA);
+					LPBYTE pBuffer = file.GetFileData();
+					베트파일헤더포 헤더포 = (베트파일헤더포)file.GetFileData();
+
+					LPSTICKS_HEADER pHeader = (LPSTICKS_HEADER)pStickBufferPtr;
+					pHeader->nStickType = 헤더포->nStickType;
+					pHeader->nStickLength = 헤더포->nStickLength;
+					pHeader->nMaxSticks = 500;
+					pHeader->nCountSticks = DMIN(헤더포->nCountSticks, 500);
+					strcpy_s(pHeader->크레온코드, _countof(pHeader->크레온코드), 헤더포->크레온코드);
+					pStickBufferPtr += sizeof(STICKS_HEADER);
+					
+					// 읽은 헤더포 증가
+					pBuffer += 0x1000;
+
+					for (size_t i = 0; i < pHeader->nCountSticks; i++)
+					{	// 스틱을 채우고
+						LPSTICK_DATAF pStickData = (LPSTICK_DATAF)pStickBufferPtr;
+						LPBET_STICK_EX 기존스틱포 = (LPBET_STICK_EX)pBuffer;
+						pStickData->nDate = 기존스틱포->nDate;
+						pStickData->nTime = 기존스틱포->nTime;
+
+						디뷰("(%d/%d)", 기존스틱포->nDate, 기존스틱포->nTime);
+						pStickBufferPtr += sizeof(STICK_DATAF);
+						pBuffer += sizeof(BET_STICK_EX);
 					}
+					// 다 채웠으면 포인터를 해당 스틱의 처음으로 이동한 다음
+					pStickBufferPtr = (LPBYTE)pHeader;
+					// 한번에 건너띄기 한다.
+					pStickBufferPtr += (sizeof(STICKS_HEADER) + (sizeof(STICK_DATAF) * pHeader->nCountSticks));
+
+					file.Destroy();
 					디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());
 				}
 			}
@@ -143,6 +166,7 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 		DSAFE_DELETE_ARRAY(pPath);
 		dk::멈춰();
 	} while (true);
+	힙해제(pStickBuffer);
 	디뷰("C_FILE_HANDLER::ThreadFunc(end)");
 	return(0);
 }
@@ -153,6 +177,8 @@ size_t C_MAIN::DropFile(LPCSTR _pPath)
 {
 	if (!pFileHandler)
 	{
+		
+
 		pFileHandler = new C_FILE_HANDLER();
 		pFileHandler->ThreadStart();
 	}
