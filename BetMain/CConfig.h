@@ -84,6 +84,7 @@ public:
 	std::string 기본경로, 설정파일, 크레온설정파일, 이베스트설정파일;
 	std::string 크레온계정, 크레온비밀번호, 인증서비밀번호;
 	std::string 캔들저장소, 스케줄저장소;
+	std::string 캐시저장소;
 
 	bool 사용_데이터베이스{ false }, 디비_접속여부{ false };
 	std::string 디비_아이피, 디비_계정, 디비_비밀번호;
@@ -97,6 +98,7 @@ public:
 	LPCSTR 경로_스케쥴저장소() { return(스케줄저장소.c_str()); }
 
 	LPSTR MakePathSticks(LPSTR _경로버퍼, size_t _경로버퍼크기, BYTE _캔들의종류, WORD _캔들의길이, LPCSTR _코드, LPCSTR _확장자);
+	LPSTR MakePrePath(LPSTR _경로버퍼, size_t _경로버퍼크기, BYTE _캔들의종류, WORD _캔들의길이, LPCSTR _코드, LPCSTR _확장자);
 
 	void 초기화();
 	void 소멸();

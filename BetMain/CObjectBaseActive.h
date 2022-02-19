@@ -55,16 +55,13 @@ constexpr WORD nSecondLengths[_MAX_USE_SECOND_] = { 1, 5, 10, 15, 30, 45, 135 };
 #if defined(_사용_분봉_)
 enum
 {
-	_USE_MINUTE_1_ = 0
-	, _USE_MINUTE_5_
-	, _USE_MINUTE_15_
+	_USE_MINUTE_5_ = 0
+	, _USE_MINUTE_18_
 	, _USE_MINUTE_30_
-	, _USE_MINUTE_45_
 	, _USE_MINUTE_135_
 	, _MAX_USE_MINUTE_
 };
-constexpr WORD nMinuteLengths[_MAX_USE_MINUTE_] = { 1, 5, 15, 30, 45, 135 };
-//constexpr WORD nSecondOfMinute[_MAX_USE_MINUTE_] = { 60, 300, 900, 1800, 2700, 8100 };
+constexpr WORD nMinuteLengths[_MAX_USE_MINUTE_] = { 5, 18, 30, 135 };
 #endif
 
 #define _사용_볼린저밴드_

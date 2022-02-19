@@ -207,7 +207,7 @@ LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData)
 		case _PKT_BRIDGE_SUCCEEDED_STOCK_INFO_CREON_:
 			pBridgeCreon->SetStatus(_브릿지_종목전송완료_);
 			//pGame->PreReadySticks();
-			디뷰("BridgeCallbackCreon(_PKT_BRIDGE_SUCCEEDED_STOCK_INFO_CREON_) - 다 받음: %d", pGame->벡터_감시할_종목코드.size());
+			디뷰("BridgeCallbackCreon(_PKT_BRIDGE_SUCCEEDED_STOCK_INFO_CREON_) - 다 받음: %d", pGame->vReadyCode.size());
 			break;
 		case _PKT_PIPE_INFO_STOCK_OHLCV_:
 			디뷰("BridgeCallbackCreon(_PKT_PIPE_INFO_STOCK_OHLCV_)");

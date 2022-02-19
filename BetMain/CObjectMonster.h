@@ -59,8 +59,6 @@ public:
 
 	float 체결강도{ 0.0f };
 
-	
-
 	bool 상태{ false };
 	bool 관리종목{ false };					// 0 이 아니면 거름
 	BYTE 상태_크레온{ 0 };				// 위험 경고 등 0 이 아니면 거름
@@ -99,7 +97,7 @@ public:
 	ARRAY_STICK_BASE 주봉;
 	ARRAY_STICK_BASE 일봉;
 	// 각 분봉
-	ARRAY_STICK_BASE 분봉[11];
+	ARRAY_STICK_BASE 분봉[_MAX_USE_MINUTE_];
 	void InitSticks();
 
 	_STICK_DATA stickToday;

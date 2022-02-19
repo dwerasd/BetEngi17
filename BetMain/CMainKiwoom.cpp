@@ -94,7 +94,7 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 			break;
 		case _PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_:
 			pBridgeKiwoom->SetStatus(_브릿지_종목전송완료_);
-			디뷰("_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_: %d", pGame->벡터_감시할_종목코드.size());
+			디뷰("_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_: %d", pGame->vReadyCode.size());
 			break;
 		case _PKT_PIPE_KIWOOM_REQUEST_TRANSACTION_:
 			break;

@@ -467,6 +467,159 @@ long C_MAIN::Draw_Popup_Option(bool& _bVisible)
 	return(nResult);
 }
 
+void SaveCaches(LPCSTR _pStockCode, C_OBJECT_MONSTER* _pMonster)
+{
+	static size_t nCacheSize = ((_MAX_PATH + 48) * _MAX_ARRAY_BUFFER_SIZE_) * (3 + _MAX_USE_MINUTE_);
+	디뷰("[%s] nCacheSize: %d", _pStockCode, nCacheSize);
+	if (!_pMonster->일봉.size()) { return; }
+
+	std::string path = 설정()->캐시저장소 + "Monsters/";
+
+	std::string pathCache = path + _pStockCode;
+
+	dk::C_FILE file(pathCache.c_str()
+		, GENERIC_WRITE																// 쓰기만할꺼고
+		, 0																			// 열었을때 다른곳에서 접근 불가.
+		, CREATE_ALWAYS																// 있어도 덮어씌운다
+		, FILE_ATTRIBUTE_NORMAL// | FILE_FLAG_WRITE_THROUGH							// 캐싱하지 않고 파일에 바로 쓴다.);
+	);
+	size_t 봉한개영역크기 = ((_MAX_PATH + 48) * _MAX_ARRAY_BUFFER_SIZE_);
+	LPBYTE pCacheBuffer = (LPBYTE)힙할당(봉한개영역크기 * (3 + _MAX_USE_MINUTE_));	// (((카운트+인덱스+날짜+시간+시고저종+거래량+_MAX_PATH) * 500) * (일주월 + 분봉))
+	size_t 저장된프레임갯수 = 0;
+	LPBYTE pCacheBufferPtr = pCacheBuffer + (봉한개영역크기 * 저장된프레임갯수);
+	for (size_t 분봉인덱스 = 0; 분봉인덱스 < _MAX_USE_MINUTE_; 분봉인덱스++)
+	{	// 사용되는 분봉 한개씩 돌면서
+		pCacheBufferPtr = pCacheBuffer + (봉한개영역크기 * 저장된프레임갯수);
+
+		*(LPWORD)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].nArrayCount;
+		pCacheBufferPtr += sizeof(WORD);
+		*(LPWORD)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].nCurrentIndex;
+		pCacheBufferPtr += sizeof(WORD);
+		memcpy_s(pCacheBufferPtr, _MAX_PATH, _pMonster->분봉[분봉인덱스].path.c_str(), _pMonster->분봉[분봉인덱스].path.length());
+		pCacheBufferPtr += _MAX_PATH;
+		for (size_t i = 0; i < _pMonster->분봉[분봉인덱스].nArrayCount; i++)
+		{	// 500개 저장한다.
+			*(PULONG)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].date[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(PULONG)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].time[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(double*)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].open[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].high[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].low[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].close[i];
+			pCacheBufferPtr += sizeof(double);
+			*(PULONG)pCacheBufferPtr = _pMonster->분봉[분봉인덱스].volume[i];
+			pCacheBufferPtr += sizeof(ULONG);
+		}
+		저장된프레임갯수++;
+		디뷰("%d 분봉 %d개 다씀: %d / %d", nMinuteLengths[분봉인덱스], _pMonster->분봉[분봉인덱스].nArrayCount, pCacheBufferPtr - pCacheBuffer, _pMonster->분봉[분봉인덱스].date[_pMonster->분봉[분봉인덱스].nArrayCount - 1]);
+	}
+
+	// 그 다음 일봉
+	{
+		pCacheBufferPtr = pCacheBuffer + (봉한개영역크기 * 저장된프레임갯수);
+
+		*(LPWORD)pCacheBufferPtr = _pMonster->일봉.nArrayCount;
+		pCacheBufferPtr += sizeof(WORD);
+		*(LPWORD)pCacheBufferPtr = _pMonster->일봉.nCurrentIndex;
+		pCacheBufferPtr += sizeof(WORD);
+		memcpy_s(pCacheBufferPtr, _MAX_PATH, _pMonster->일봉.path.c_str(), _pMonster->일봉.path.length());
+		pCacheBufferPtr += _MAX_PATH;
+		for (size_t i = 0; i < _pMonster->일봉.nArrayCount; i++)
+		{	// 500개 저장한다.
+			*(PULONG)pCacheBufferPtr = _pMonster->일봉.date[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(PULONG)pCacheBufferPtr = _pMonster->일봉.time[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(double*)pCacheBufferPtr = _pMonster->일봉.open[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->일봉.high[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->일봉.low[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->일봉.close[i];
+			pCacheBufferPtr += sizeof(double);
+			*(PULONG)pCacheBufferPtr = _pMonster->일봉.volume[i];
+			pCacheBufferPtr += sizeof(ULONG);
+		}
+		저장된프레임갯수++;
+		디뷰("일봉 %d개 다씀: %d %d", _pMonster->일봉.nArrayCount, pCacheBufferPtr - pCacheBuffer, _pMonster->일봉.date[_pMonster->일봉.nArrayCount-1]);
+	}
+
+	// 주봉
+	{
+		pCacheBufferPtr = pCacheBuffer + (봉한개영역크기 * 저장된프레임갯수);
+
+		*(LPWORD)pCacheBufferPtr = _pMonster->주봉.nArrayCount;
+		pCacheBufferPtr += sizeof(WORD);
+		*(LPWORD)pCacheBufferPtr = _pMonster->주봉.nCurrentIndex;
+		pCacheBufferPtr += sizeof(WORD);
+		memcpy_s(pCacheBufferPtr, _MAX_PATH, _pMonster->주봉.path.c_str(), _pMonster->주봉.path.length());
+		pCacheBufferPtr += _MAX_PATH;
+		for (size_t i = 0; i < _pMonster->주봉.nArrayCount; i++)
+		{	// 500개 저장한다.
+			*(PULONG)pCacheBufferPtr = _pMonster->주봉.date[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(PULONG)pCacheBufferPtr = _pMonster->주봉.time[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(double*)pCacheBufferPtr = _pMonster->주봉.open[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->주봉.high[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->주봉.low[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->주봉.close[i];
+			pCacheBufferPtr += sizeof(double);
+			*(PULONG)pCacheBufferPtr = _pMonster->주봉.volume[i];
+			pCacheBufferPtr += sizeof(ULONG);
+		}
+		저장된프레임갯수++;
+		디뷰("주봉 %d개 다씀: %d", _pMonster->주봉.nArrayCount, pCacheBufferPtr - pCacheBuffer);
+	}
+
+	// 월봉
+	{
+		pCacheBufferPtr = pCacheBuffer + (봉한개영역크기 * 저장된프레임갯수);
+
+		*(LPWORD)pCacheBufferPtr = _pMonster->월봉.nArrayCount;
+		pCacheBufferPtr += sizeof(WORD);
+		*(LPWORD)pCacheBufferPtr = _pMonster->월봉.nCurrentIndex;
+		pCacheBufferPtr += sizeof(WORD);
+		memcpy_s(pCacheBufferPtr, _MAX_PATH, _pMonster->월봉.path.c_str(), _pMonster->월봉.path.length());
+		pCacheBufferPtr += _MAX_PATH;
+		for (size_t i = 0; i < _pMonster->월봉.nArrayCount; i++)
+		{	// 500개 저장한다.
+			*(PULONG)pCacheBufferPtr = _pMonster->월봉.date[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(PULONG)pCacheBufferPtr = _pMonster->월봉.time[i];
+			pCacheBufferPtr += sizeof(ULONG);
+			*(double*)pCacheBufferPtr = _pMonster->월봉.open[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->월봉.high[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->월봉.low[i];
+			pCacheBufferPtr += sizeof(double);
+			*(double*)pCacheBufferPtr = _pMonster->월봉.close[i];
+			pCacheBufferPtr += sizeof(double);
+			*(PULONG)pCacheBufferPtr = _pMonster->월봉.volume[i];
+			pCacheBufferPtr += sizeof(ULONG);
+		}
+		저장된프레임갯수++;
+		디뷰("월봉 %d개 다씀: %d", _pMonster->월봉.nArrayCount, pCacheBufferPtr - pCacheBuffer);
+	}
+	// 마지막까지 고정사이즈를 채우고
+	pCacheBufferPtr = pCacheBuffer + (봉한개영역크기 * 저장된프레임갯수);
+	// 크기를 구하고
+	DWORD nSaveSize = (DWORD)(pCacheBufferPtr - pCacheBuffer);
+	// 저장한다.
+	file.Write(pCacheBuffer, nSaveSize);
+	file.Destroy();
+	힙해제(pCacheBuffer);
+}
+
 long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 {
 	long nResult = 0;
@@ -560,10 +713,10 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				}
 				DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pGame->nCountAccrueTick);
 				size_t nSaveSize = (pGame->pTickBufferPtr - pGame->pTickBuffer);
-				dk::C_FILE whiteFile(저장경로
+				dk::C_FILE whiteFile(저장경로.c_str()
 					, GENERIC_WRITE																// 쓰기만할꺼고
 					, 0																			// 열었을때 다른곳에서 접근 불가.
-					, dk::FileExists(저장경로) ? OPEN_ALWAYS : CREATE_ALWAYS					// 파일이 있으면 열고 없으면 만든다.
+					, dk::FileExists(저장경로.c_str()) ? OPEN_ALWAYS : CREATE_ALWAYS			// 파일이 있으면 열고 없으면 만든다.
 					, FILE_ATTRIBUTE_NORMAL// | FILE_FLAG_WRITE_THROUGH							// 캐싱하지 않고 파일에 바로 쓴다.);
 				);
 				
@@ -571,12 +724,50 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				DBGPRINT("[ENGINE] 총 %d 개 쓰기 완료", pGame->nCountAccrueTick);
 				whiteFile.Destroy();
 			}
+			if (ImGui::Button(GetUtf8("캔들준비"), 버튼크기))
+			{
+				pGame->PreReadySticks();
+			}
+			if (ImGui::Button(GetUtf8("캐시저장"), 버튼크기))
+			{
+				size_t nCacheSize = ((_MAX_PATH + 48) * _MAX_ARRAY_BUFFER_SIZE_) * (3 + _MAX_USE_MINUTE_);
+				디뷰("nCacheSize: %d", nCacheSize);
+				std::string path = 설정()->캐시저장소 + "Monsters/";
+				
+				for (auto itr : pGame->umObjectMonsters)
+				//auto itr = pGame->umObjectMonsters.begin();
+				{
+					SaveCaches(itr.first.c_str(), itr.second);
+				}
+			}
+			extern LPBYTE pStickBuffer;
+			extern LPBYTE pStickBufferPtr;
+			extern size_t 스틱등록된종목수;
+			ImGui::Text(GetUtf8("스틱등록된종목수"));
+			ImGui::SameLine();
+			ImGui::Text(" - %d", 스틱등록된종목수);
+			if (ImGui::Button(GetUtf8("스틱저장"), 버튼크기))
+			{
+				std::string 저장경로 = "F:/data/sticks/mon1";
+				저장경로 += ".stick";
+
+				size_t nSaveSize = (pStickBufferPtr - pStickBuffer);
+				dk::C_FILE whiteFile(저장경로.c_str()
+					, GENERIC_WRITE																// 쓰기만할꺼고
+					, 0																			// 열었을때 다른곳에서 접근 불가.
+					, dk::FileExists(저장경로.c_str()) ? OPEN_ALWAYS : CREATE_ALWAYS					// 파일이 있으면 열고 없으면 만든다.
+					, FILE_ATTRIBUTE_NORMAL// | FILE_FLAG_WRITE_THROUGH							// 캐싱하지 않고 파일에 바로 쓴다.);
+				);
+				whiteFile.Write(pStickBuffer, (ULONG)nSaveSize);
+				DBGPRINT("[ENGINE] [%s] %d 종목 쓰기 완료, size: %d ", 저장경로.c_str(), 스틱등록된종목수, nSaveSize);
+				whiteFile.Destroy();
+			}
 			static size_t nCountCreonObjects = 0;
 			if (!nCountCreonObjects)
 			{	// size 호출을 분기 하나로 비용 절감.
 				if (pBridgeCreon->GetStatus() == _브릿지_종목전송완료_)
 				{
-					nCountCreonObjects = pGame->벡터_감시할_종목코드.size();
+					nCountCreonObjects = pGame->vReadyCode.size();
 				}
 			}
 			ImGui::Text(GetUtf8("크레온 리스트"));
@@ -588,10 +779,10 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				for (int n = 0; n < nCountCreonObjects; n++)
 				{
 					const bool is_selected = (nCreonListIndex == n);
-					if (ImGui::Selectable(GetUtf8(pGame->벡터_감시할_종목코드[n].c_str()), is_selected))
+					if (ImGui::Selectable(GetUtf8(pGame->vReadyCode[n].c_str()), is_selected))
 					{
 						nCreonListIndex = n;
-						strcpy_s(pGame->선택된종목코드, pGame->벡터_감시할_종목코드[n].c_str());
+						strcpy_s(pGame->선택된종목코드, pGame->vReadyCode[n].c_str());
 						// 선택된 종목코드의 정보를 띄우자.
 					}
 					if (is_selected)
@@ -639,7 +830,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 							::memset(&packet, 0, sizeof(PACKET_BASE));
 						}
 						// 처음부터 종목코드를 szBuffer에 붙여넣기를 반복한다.
-						::strcat_s(요청패킷포->szStocks, pGame->벡터_감시할_종목코드[i].c_str());
+						::strcat_s(요청패킷포->szStocks, pGame->vReadyCode[i].c_str());
 						::strcat_s(요청패킷포->szStocks, ";");
 						nAccrueRequestCount++;
 					}

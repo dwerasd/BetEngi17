@@ -2,6 +2,10 @@
 #include "CMain.h"
 
 
+
+LPBYTE pStickBuffer = (LPBYTE)힙할당((sizeof(STICKS_HEADER) + ((sizeof(STICK_DATAF) * 500)) * 3000));
+LPBYTE pStickBufferPtr = pStickBuffer;
+size_t 스틱등록된종목수 = 0;
 class C_FILE_HANDLER
 	: public dk::C_THREAD
 {
@@ -18,8 +22,7 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 	DWORD dwResult = 0;
 	C_GAME* pGame = (C_GAME::GetInstance());
 	디뷰("C_FILE_HANDLER::ThreadFunc(start)");
-	static LPBYTE pStickBuffer = (LPBYTE)힙할당((sizeof(STICKS_HEADER) + ((sizeof(STICK_DATAF) * 500)) * 3000));
-	static LPBYTE pStickBufferPtr = pStickBuffer;
+	
 	do
 	{
 		LPSTR pPath = nullptr;
@@ -142,20 +145,21 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 					{	// 스틱을 채우고
 						LPSTICK_DATAF pStickData = (LPSTICK_DATAF)pStickBufferPtr;
 						LPBET_STICK_EX 기존스틱포 = (LPBET_STICK_EX)pBuffer;
-						pStickData->nDate = 기존스틱포->nDate;
-						pStickData->nTime = 기존스틱포->nTime;
+						pStickData->nDate = dk::ntohl(기존스틱포->nDate);
+						pStickData->nTime = dk::ntohl(기존스틱포->nTime);
 
-						디뷰("(%d/%d)", 기존스틱포->nDate, 기존스틱포->nTime);
+						//디뷰("(%d/%d)", pStickData->nDate, pStickData->nTime);
 						pStickBufferPtr += sizeof(STICK_DATAF);
 						pBuffer += sizeof(BET_STICK_EX);
 					}
 					// 다 채웠으면 포인터를 해당 스틱의 처음으로 이동한 다음
 					pStickBufferPtr = (LPBYTE)pHeader;
 					// 한번에 건너띄기 한다.
-					pStickBufferPtr += (sizeof(STICKS_HEADER) + (sizeof(STICK_DATAF) * pHeader->nCountSticks));
+					pStickBufferPtr += (sizeof(STICKS_HEADER) + (sizeof(STICK_DATAF) * 500));
 
 					file.Destroy();
-					디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());
+					스틱등록된종목수++;
+					//디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());
 				}
 			}
 		}

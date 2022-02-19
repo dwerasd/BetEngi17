@@ -63,6 +63,8 @@ void C_CONFIG::초기화()
 		캔들저장소 = 임시버퍼;
 		::GetPrivateProfileStringA("path", "schedule", "", 임시버퍼, 배열크기(임시버퍼), 설정파일.c_str());
 		스케줄저장소 = 임시버퍼;
+		::GetPrivateProfileStringA("path", "caches", "", 임시버퍼, 배열크기(임시버퍼), 설정파일.c_str());
+		캐시저장소 = 임시버퍼;
 
 		옵션_자동실행_파이프서버[_크레온_] = (bool)::GetPrivateProfileIntA("autostart", "pipe_server_creon", 0, 설정파일.c_str());
 		옵션_자동실행_파이프서버[_키움_] = (bool)::GetPrivateProfileIntA("autostart", "pipe_server_kiwoom", 0, 설정파일.c_str());
@@ -190,8 +192,37 @@ LPSTR C_CONFIG::MakePathSticks(LPSTR _경로버퍼, size_t _경로버퍼크기, 
 	::strcat_s(_경로버퍼, _경로버퍼크기, 임시버퍼);
 	// 폴더가 없으면 생성한다.
 	if (!::PathIsDirectoryA(_경로버퍼)) { ::CreateDirectoryA(_경로버퍼, NULL); }
-	if (_코드) { strcat_s(_경로버퍼, _경로버퍼크기, _코드); }
-	if (_확장자) { strcat_s(_경로버퍼, _경로버퍼크기, _확장자); }
+	if (_코드) { ::strcat_s(_경로버퍼, _경로버퍼크기, _코드); }
+	if (_확장자) { ::strcat_s(_경로버퍼, _경로버퍼크기, _확장자); }
 	return(_경로버퍼);
 }
 
+LPSTR C_CONFIG::MakePrePath(LPSTR _경로버퍼, size_t _경로버퍼크기, BYTE _캔들의종류, WORD _캔들의길이, LPCSTR _코드, LPCSTR _확장자)
+{
+	dk::초기화(_경로버퍼, _경로버퍼크기);
+	::strcpy_s(_경로버퍼, _경로버퍼크기, 캔들저장소.c_str());
+	if (!::PathIsDirectoryA(_경로버퍼)) { ::CreateDirectoryA(_경로버퍼, NULL); }	// StockSticks 폴더가 없다면 생성.
+	char 임시버퍼[(1 << 5)] = { 0 };
+	if (0 == _캔들의종류)
+	{	// 분봉, StockSticks/minute1/, StockSticks/minute15/
+		::sprintf_s(임시버퍼, "minute%d", _캔들의길이);
+	}
+	else if (1 == _캔들의종류)
+	{	// StockSticks/day/
+		::sprintf_s(임시버퍼, "day%d", _캔들의길이);
+	}
+	else if (2 == _캔들의종류)
+	{	// StockSticks/week/
+		::sprintf_s(임시버퍼, "week%d", _캔들의길이);
+	}
+	else if (3 == _캔들의종류)
+	{	// StockSticks/month/
+		::sprintf_s(임시버퍼, "month%d", _캔들의길이);
+	}
+	::strcat_s(_경로버퍼, _경로버퍼크기, 임시버퍼);
+	// 폴더가 없으면 생성한다.
+	if (!::PathIsDirectoryA(_경로버퍼)) { ::CreateDirectoryA(_경로버퍼, NULL); }
+	if (_코드) { ::strcat_s(_경로버퍼, _경로버퍼크기, _코드); }
+	if (_확장자) { ::strcat_s(_경로버퍼, _경로버퍼크기, _확장자); }
+	return(_경로버퍼);
+}

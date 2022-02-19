@@ -43,12 +43,12 @@ void C_GAME::초기화()
 	디뷰("sizeof(캔들_기본): %d / 힙크기(대용량임시버퍼) = %zd", sizeof(캔들_기본), 힙크기(대용량임시버퍼));
 	// 파일 읽기용 버퍼 초기화. 할당은 읽을때마다 새로 한다.
 	
-	size_t 코드갯수 = 벡터_감시할_종목코드.size();
+	size_t 코드갯수 = vReadyCode.size();
 	for (size_t 인덱스 = 0; 인덱스 < 코드갯수; 인덱스++)
 	{
-		DSAFE_DELETE(umObjectMonsters[벡터_감시할_종목코드[인덱스]]);
+		DSAFE_DELETE(umObjectMonsters[vReadyCode[인덱스]]);
 	}
-	벡터_감시할_종목코드.clear();
+	vReadyCode.clear();
 	umObjectMonsters.clear();
 
 	//char 임시버퍼[(1 << 10)] = { 0 };
@@ -69,7 +69,7 @@ void C_GAME::InitMonster(LPSTOCK_INFO_CREON _종목정보)
 {	// 있으믄 그냥 지우고 새로 할당받는거다.
 	DSAFE_DELETE(umObjectMonsters[_종목정보->종목코드]);
 	C_OBJECT_MONSTER* pStock = umObjectMonsters[_종목정보->종목코드] = new C_OBJECT_MONSTER();
-	벡터_감시할_종목코드.push_back(_종목정보->종목코드);
+	vReadyCode.push_back(_종목정보->종목코드);
 	if (!_종목정보->장구분)
 	{	// 여기 들어오면 시뮬레이션인거다.
 		
@@ -279,6 +279,21 @@ void C_GAME::HandlerTick(LPTICK_DATA _pTick)
 		벡터_감시중인_종목코드.push_back(_pTick->szCode);
 		nCountRealObjects++;	// 체결로 들어오는 종목수를 체크하기 위한 변수.
 		pStock->vTransactionTicks.clear();
+		if (0 < pStock->분봉[0].nArrayCount)
+		{
+			디뷰("첫체결[%s] - lastdate: %d, lasttime: %d, index: %d"
+			, _pTick->szCode
+			, pStock->분봉[0].date[pStock->분봉[0].nCurrentIndex]
+			, pStock->분봉[0].time[pStock->분봉[0].nCurrentIndex]
+			, pStock->분봉[0].nCurrentIndex
+		);
+		}
+		//디뷰("첫체결[%s] - size: %d / %d"
+		//	, _pTick->szCode
+		//	, pStock->분봉[0].nCurrentIndex
+		//	, pStock->분봉[0].nArrayCount
+		//);
+		
 	}
 	if (0 < _pTick->nTransVolume)
 	{
@@ -299,6 +314,7 @@ void C_GAME::HandlerTick(LPTICK_DATA _pTick)
 long C_GAME::LoadSticks(LPARRAY_STICK_BASE _캔들포)
 {
 	long nResult = 0;
+	//디뷰("C_GAME::LoadSticks(%s)", _캔들포->path.c_str());
 	if (1 == dk::파일체크(_캔들포->path.c_str()))
 	{
 		dk::C_FILE 파일(_캔들포->path.c_str());
@@ -334,25 +350,52 @@ long C_GAME::LoadSticks(LPARRAY_STICK_BASE _캔들포)
 
 void C_GAME::PreReadySticks()
 {
+	//std::string path = "F:/data/ReadySticks/";
+	//std::string minute[_MAX_USE_MINUTE_] = 
+	//{
+	//	path + "minute1.stick"
+	//	, path + "minute5.stick"
+	//	, path + "minute18.stick"
+	//	, path + "minute135.stick"
+	//};
+	//std::string day1 = path + "day1.stick";
+	//std::string week1 = path + "week1.stick";
+	//std::string month1 = path + "month1.stick";
+	
 	퍼포먼스타이머[0].시작();
 	size_t 세팅된종목수 = 0;
-	size_t 종목총갯수 = 벡터_감시할_종목코드.size();
+	size_t 종목총갯수 = vReadyCode.size();
 	for (size_t 종목인덱스 = 0; 종목인덱스 < 종목총갯수; 종목인덱스++)
 	{
-		C_OBJECT_MONSTER* pStock = FindMonster(벡터_감시할_종목코드[종목인덱스].c_str());
+		C_OBJECT_MONSTER* pStock = FindMonster(vReadyCode[종목인덱스].c_str());
 		if (pStock)
 		{
 			퍼포먼스타이머[2].시작();
 			pStock->InitSticks();
 			for (size_t 캔들인덱스 = 0; 캔들인덱스 < 배열크기(nMinuteLengths); 캔들인덱스++)
 			{
+				/*
+				dk::C_FILE file(minute[캔들인덱스]);
+				LPBYTE pBuffer = file.GetFileData();
+				size_t 종목수 = file.GetReadSize() / (sizeof(STICKS_HEADER) + (sizeof(STICK_DATAF) * 500));
+				디뷰("종목수: %d", 종목수);
+				for (size_t i = 0; i < 종목수; i++)
+				{
+					LPSTICK_DATAF pStickData = (LPSTICK_DATAF)pBuffer;
+
+
+					// 다음종목으로
+					pBuffer += (sizeof(STICKS_HEADER) + (sizeof(STICK_DATAF) * 500));
+				}
+				file.Destroy();
+				*/
 				LoadSticks(&pStock->분봉[캔들인덱스]);
 			}
 			LoadSticks(&pStock->일봉);
 			LoadSticks(&pStock->주봉);
 			LoadSticks(&pStock->월봉);
 			세팅된종목수++;
-			디뷰("C_GAME::PreReadySticks() - %s 완료 / 경과된시간: %0.6f", 벡터_감시할_종목코드[종목인덱스].c_str(), 퍼포먼스타이머[2].경과된시간());
+			//디뷰("C_GAME::PreReadySticks() - %s 완료 / 경과된시간: %0.6f", vReadyCode[종목인덱스].c_str(), 퍼포먼스타이머[2].경과된시간());
 		}
 	}
 	디뷰("C_GAME::PreReadySticks() - 세팅된종목수: %d, 경과된시간: %0.6f", 세팅된종목수, 퍼포먼스타이머[0].경과된시간());

@@ -58,8 +58,6 @@ private:
 	dk::C_TIMER_QP 퍼포먼스타이머[10];
 
 	DWORD ThreadFunc(LPVOID _pParam);
-
-	
 	
 public:
 	C_GAME();
@@ -68,7 +66,7 @@ public:
 	// 디비 호출은 느리니까 처음에 전부 가져와서 가지고 있는다.
 	std::vector<std::string> 벡터_모든_종목코드;
 
-	std::vector<std::string> 벡터_감시할_종목코드;
+	std::vector<std::string> vReadyCode;
 	std::vector<std::string> 벡터_감시중인_종목코드;
 
 	UMAP_MONSTERS umObjectMonsters;
