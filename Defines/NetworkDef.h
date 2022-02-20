@@ -57,6 +57,8 @@ enum _PKT_INDEX_
 
 	, _PKT_PIPE_KIWOOM_REQUEST_TRANSACTION_					// 키움 실시간 체결 데이터 요청
 	, _PKT_PIPE_KIWOOM_RECEIVE_TRANSACTION_			// 키움 실시간 체결 데이터 날라옴
+	, _브릿지패킷_키움_주식호가잔량_						// 키움 실시간 체결 데이터 날라옴
+	, _브릿지패킷_키움_장시작시간_						// 키움 실시간 체결 데이터 날라옴
 
 	, _PKT_PIPE_RECIVE_REALTIME_REMAIN_DATA_			// 실시간 호가창 데이터 요청
 	, _브릿지패킷_키움_예수금상세현황요청_					// 예수금상세현황요청
@@ -94,7 +96,8 @@ enum _PKT_INDEX_
 	, _PKT_NET_CONNECTED_								// 접속 직후 보냄
 	, _PKT_NET_DISCONNECTED_							// 프로그램이 종료될 때 보냄.
 	, _PKT_NET_RECEIVE_STOCKINFO_KIWOOM_				// 키움 종목 패킷이다.
-	, _PKT_NET_RECEIVE_TRANSACTION_KIWOOM_				// 키움 체결 데이터다
+	, _네트워크패킷_키움_주식체결_						// 키움 체결 데이터다
+	, _네트워크패킷_키움_주식호가잔량_					// 키움 체결 데이터다
 	, _PKT_NET_RECEIVE_TRANSACTION_EBEST_				// 이베스트 체결데이터다.
 	, _PKT_NET_REQUEST_LOGIN_							// 유저 로그인
 	, _PKT_NET_RESULT_LOGIN_SUCCEED_					// 로그인 성공
@@ -352,31 +355,29 @@ typedef struct _STOCK_BASE_INFO
 typedef struct _KIWOOM_REALDATA_HEADER
 {
 	BYTE nRealType;						// 주식시세, 주식체결 등
-	char szStockCode[(1 << 3)];			// 종목코드
+	char 종목코드[(1 << 3)];			// 종목코드
 } KIWOOM_REALDATA_HEADER, *LPKIWOOM_REALDATA_HEADER;
 
 typedef struct _KIWOOM_REALDATA_TRANSACTION
 	: public _KIWOOM_REALDATA_HEADER
 {
-	//char szMessageType[(1 << 4)];		// 주식시세, 주식체결 등
-	//BYTE nRealType{ 0 };				// 주식시세, 주식체결 등.
-	//char szStockCode[(1 << 3)];			// 종목코드
-	char szTime[(1 << 5)];				// 091259
+	char 체결시간[(1 << 5)];			// 091259
 	char szOpen[(1 << 4)];				// 시 10000000
 	char szHigh[(1 << 4)];				// 고 10000000
 	char szLow[(1 << 4)];				// 저 10000000
-	char szClose[(1 << 4)];				// 종 10000000
-	char szPriceSell[(1 << 4)];			// 최우선매도호가
-	char szPriceBuy[(1 << 4)];			// 최우선매수호가
-	char szVolume[(1 << 4)];			// 거래량 9999999999999
-	char szAccrueVolume[(1 << 4)];		// 누적거래량 9999999999999
-	char szAccruePayment[(1 << 4)];		// 누적거래대금 9999999999999
-	char szStrength[1 << 4];			// 체결강도
-
-	//DWORD nMessageSize;									// 원본 메시지 크기
-	//char szAllMessage[(1 << 14) - sizeof(DWORD)];		// 메시지 원본
+	char 체결가[(1 << 4)];				// 종 10000000
+	char 최우선매도호가[(1 << 4)];		// 최우선매도호가
+	char 최우선매수호가[(1 << 4)];		// 최우선매수호가
+	char 체결량[(1 << 4)];			// 거래량 9999999999999
+	char 누적거래량[(1 << 4)];		// 누적거래량 9999999999999
+	char 누적거래대금[(1 << 4)];		// 누적거래대금 9999999999999
+	char 체결강도[(1 << 4)];			// 체결강도
+	char 등락율[(1 << 4)];
+	char 전일거래량대비[(1 << 4)];		// 전일거래량대비(비율)
+	char 거래회전율[(1 << 4)];
+	char 시가총액[(1 << 4)];
+	char 전일동시간거래량비율[(1 << 4)];
 	void clear() { ::memset(this, 0, sizeof(_KIWOOM_REALDATA_TRANSACTION)); }
-
 } KIWOOM_REALDATA_TRANSACTION, *LPKIWOOM_REALDATA_TRANSACTION;
 
 typedef struct _키움_예수금상세현황
@@ -389,11 +390,19 @@ typedef struct _키움_예수금상세현황
 typedef struct _키움_주식호가잔량
 	: public _KIWOOM_REALDATA_HEADER
 {
-	UINT64 매도호가총잔량{ 0 };
-	UINT64 매수호가총잔량{ 0 };
-
 	char 호가시간[(1 << 5)];				// 091259
+	char 매도호가총잔량[(1 << 4)];
+	char 매수호가총잔량[(1 << 4)];
+	char 매도비율[(1 << 4)];
 } 키움_주식호가잔량, * 키움_주식호가잔량포;
+
+typedef struct _ORDERBOOK_KIWOOM
+{
+	char 종목코드[(1 << 3)] = { 0 };				// 091259
+	ULONG 매도호가총잔량{ 0 };
+	ULONG 매수호가총잔량{ 0 };
+	float 매도비율{ 0.0f };
+} ORDERBOOK_KIWOOM, *LPORDERBOOK_KIWOOM;
 
 typedef struct _키움_장시작시간
 	: public _KIWOOM_REALDATA_HEADER

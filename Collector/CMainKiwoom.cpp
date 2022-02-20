@@ -7,8 +7,8 @@
 // 브릿지 패킷은 모두 여기에서 처리한다.
 
 static C_MAIN* pMain = nullptr;
-static C_GAME* pGame = nullptr;
-static C_BRIDGE_KIWOOM* pBridgeKiwoom = nullptr;
+//static C_GAME* pGame = nullptr;
+static C_BRIDGE_BASE* pBridgeKiwoom = nullptr;
 LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 {
 	try
@@ -21,7 +21,7 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 		case _브릿지패킷_키움_클라이언트_접속_:
 			if (!pMain) { pMain = C_MAIN::GetInstance(); }
 			if (!pBridgeKiwoom) { pBridgeKiwoom = pMain->pBridgeKiwoom; }
-			if (!pGame) { pGame = C_GAME::GetInstance(); }
+			//if (!pGame) { pGame = C_GAME::GetInstance(); }
 			pBridgeKiwoom->SetStatus(_브릿지_로그인중_);
 			do
 			{	// 크레온 기다림.
@@ -45,14 +45,14 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 				//디뷰("키움 아이디: %s", 로그인정보->아이디);
 				//디뷰("키움 사용자명: %s", 로그인정보->사용자명);
 				//디뷰("키움 계좌받음. 갯수: %d", 로그인정보->계좌갯수);
-				pBridgeKiwoom->키움_모의서버 = 로그인정보->모의서버;
-				pBridgeKiwoom->키움_아이디 = 로그인정보->아이디;
-				pBridgeKiwoom->키움_사용자명 = 로그인정보->사용자명;
-				for (BYTE i = 0; i < 로그인정보->계좌갯수; i++)
-				{
-					pBridgeKiwoom->vBankAccountNumber.push_back(로그인정보->계좌번호[i]);
-					디뷰("키움 계좌번호: %s", 로그인정보->계좌번호[i]);
-				}
+				//pBridgeKiwoom->키움_모의서버 = 로그인정보->모의서버;
+				//pBridgeKiwoom->키움_아이디 = 로그인정보->아이디;
+				//pBridgeKiwoom->키움_사용자명 = 로그인정보->사용자명;
+				//for (BYTE i = 0; i < 로그인정보->계좌갯수; i++)
+				//{
+				//	pBridgeKiwoom->vBankAccountNumber.push_back(로그인정보->계좌번호[i]);
+				//	디뷰("키움 계좌번호: %s", 로그인정보->계좌번호[i]);
+				//}
 				// 조건식을 요청한다. _브릿지패킷_키움_조건식요청_
 				pBridgeKiwoom->SendPipe(_브릿지패킷_키움_조건식요청_);
 			} while (false);
@@ -69,7 +69,7 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 			do
 			{	// '^' 하고 ';' 로 분류되어 이어붙여진 상태로 들어온거라 분리해야한다.
 				디뷰("조건식 리스트 받음.");
-				pBridgeKiwoom->키움_조건식등록((LPSTR)_pData);
+				//pBridgeKiwoom->키움_조건식등록((LPSTR)_pData);
 				디뷰("이제 종목 리스트를 요청한다.");
 				pBridgeKiwoom->SendPipe(_PKT_PIPE_KIWOOM_REQUEST_STOCK_INFO_);
 			} while (false);
@@ -88,13 +88,13 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 			do
 			{	// 종목이 날라온거다.
 				pBridgeKiwoom->SetStatus(_브릿지_종목전송중_);
-				pGame->UpdateMonster((LPSTOCK_INFO_KIWOOM)_pData);
+				//pGame->UpdateMonster((LPSTOCK_INFO_KIWOOM)_pData);
 				//디비()->추가_주식종목(pStockInfo->szStockName, pStockInfo->szStockCode, _키움_);
 			} while (false);
 			break;
 		case _PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_:
 			pBridgeKiwoom->SetStatus(_브릿지_종목전송완료_);
-			디뷰("_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_: %d", pGame->vReadyCode.size());
+			//디뷰("_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_: %d", pGame->vReadyCode.size());
 			break;
 		case _PKT_PIPE_KIWOOM_REQUEST_TRANSACTION_:
 			break;
@@ -107,12 +107,11 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 				case _키움_주식시세_:
 					break;
 				case _키움_주식체결_:	// 실시간 체결 데이터라면, 키움은 중계기에서 변환 후 보낸다.
-					pGame->PushTickData((LPKIWOOM_REALDATA_TRANSACTION)_pData);
+					//pGame->PushTickData((LPKIWOOM_REALDATA_TRANSACTION)_pData);
 					break;
 				case _키움_주식우선호가_:
 					break;
 				case _키움_주식호가잔량_:
-					pGame->PushOrderBookData((키움_주식호가잔량포)_pData);
 					break;
 				case _키움_주식시간외호가_:
 					break;
@@ -142,9 +141,9 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 			do
 			{
 				키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)_pData;
-				pBridgeKiwoom->키움_예수금.예수금 = 현황포->예수금;
-				pBridgeKiwoom->키움_예수금.출금가능금액 = 현황포->출금가능금액;
-				pBridgeKiwoom->키움_예수금.주문가능금액 = 현황포->주문가능금액;
+				//pBridgeKiwoom->키움_예수금.예수금 = 현황포->예수금;
+				//pBridgeKiwoom->키움_예수금.출금가능금액 = 현황포->출금가능금액;
+				//pBridgeKiwoom->키움_예수금.주문가능금액 = 현황포->주문가능금액;
 
 				디뷰("_브릿지패킷_키움_예수금상세현황받음_");
 			} while (false);

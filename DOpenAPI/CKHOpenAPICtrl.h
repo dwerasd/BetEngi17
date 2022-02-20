@@ -60,7 +60,9 @@ public:
 	long GetDataCount(LPCSTR strRecordName);
 	CStringA GetOutputValue(LPCSTR strRecordName, long nRepeatIdx, long nItemIdx);
 	CStringA GetCommData(LPCSTR strTrCode, LPCSTR strRecordName, long nIndex, LPCSTR strItemName);
+	LPCSTR GetCommDataEx(LPSTR _pBuffer, size_t _nBufferSize, LPCSTR strTrCode, LPCSTR strRecordName, long nIndex, LPCSTR strItemName);
 	CStringA GetCommRealData(LPCSTR sTrCode, long nFid);
+	LPCSTR GetCommRealDataEx(LPSTR _pBuffer, size_t _nBufferSize, LPCSTR _sRealKey, long _Field);
 	CStringA GetChejanData(long nFid);
 	// 이 아래는 새로 추가된 함수들이다.
 	CStringA GetThemeGroupList(long nType);

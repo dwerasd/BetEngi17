@@ -52,11 +52,11 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 						LPSTR pLinePtr = &szLine[0];
 						//DBGPRINT("%s", pLinePtr);
 						pLinePtr += 39;
-						memcpy_s(data.szTime, _countof(data.szTime), pLinePtr, 6);				// 시간 복사
+						memcpy_s(data.체결시간, _countof(data.체결시간), pLinePtr, 6);				// 시간 복사
 						//DBGPRINT("time: %s", data.szTime);
 
 						pLinePtr += (6 + 9);				// " / code: "
-						memcpy_s(data.szStockCode, _countof(data.szStockCode), pLinePtr, 6);	// 종목코드 복사
+						memcpy_s(data.종목코드, _countof(data.종목코드), pLinePtr, 6);	// 종목코드 복사
 						//DBGPRINT("code: %s", data.szStockCode);
 
 						pLinePtr += (6 + 6);				// ", 시: "
@@ -80,17 +80,17 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 						pLinePtr += (nLength + 6);			// ", 종: "
 						pComma = strchr(pLinePtr, ',');
 						nLength = (pComma - pLinePtr);
-						memcpy_s(data.szClose, _countof(data.szClose), pLinePtr, nLength);
+						memcpy_s(data.체결가, _countof(data.체결가), pLinePtr, nLength);
 						//DBGPRINT("szClose: %s", data.szClose);
 
 						pLinePtr += (nLength + 10);			// ", 거래량: "
 						pComma = strchr(pLinePtr + sizeof(char), ' ');	// 공백이 있을 수 있어서 한칸 더 뒤에서 찾는다.
 						nLength = (pComma - pLinePtr);
-						memcpy_s(data.szVolume, _countof(data.szVolume), pLinePtr, nLength);
+						memcpy_s(data.체결량, _countof(data.체결량), pLinePtr, nLength);
 						//DBGPRINT("szVolume: %s", data.szVolume);
 
 						pLinePtr += (nLength + 7);			// " 누적: "
-						strcpy_s(data.szAccrueVolume, _countof(data.szAccrueVolume), pLinePtr);
+						strcpy_s(data.누적거래량, _countof(data.누적거래량), pLinePtr);
 						//DBGPRINT("szAccrueVolume: %s", data.szAccrueVolume);
 						/*
 						ULONG nVolume = atoi(data.szVolume);
@@ -117,7 +117,9 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 					{
 						LPTICK_DATA pTick = (LPTICK_DATA)pBuffer;
 						dk::ntohl(pTick->nTime);
-						pGame->PushTickData(pTick);
+
+
+						//pGame->PushTickData(pTick);
 						pBuffer += sizeof(TICK_DATA);
 					}
 					디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());

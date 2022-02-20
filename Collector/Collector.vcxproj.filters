@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="기본">
+      <UniqueIdentifier>{7f795d4d-65ed-45e3-96c9-a30d5ac301b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="기본\리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="기본\소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="기본\헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="통신">
+      <UniqueIdentifier>{0bb8f977-df32-4ac2-b76f-80cefc4b4b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\TCP서버">
+      <UniqueIdentifier>{fb37a2bf-fb49-4208-8fe2-adbc1d06ab2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\파이프서버">
+      <UniqueIdentifier>{d0f6c92d-76b0-47d3-9e3e-b25f30d2e323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\파이프브릿지">
+      <UniqueIdentifier>{54b29a87-d1d6-4c05-86d3-2027ddbfd898}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CMain.h">
+      <Filter>기본\헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CNetServer.h">
+      <Filter>통신\TCP서버</Filter>
+    </ClInclude>
+    <ClInclude Include="CPipeServer.h">
+      <Filter>통신\파이프서버</Filter>
+    </ClInclude>
+    <ClInclude Include="CBridgeBase.h">
+      <Filter>통신\파이프브릿지</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Collector.rc">
+      <Filter>기본\리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+    <Image Include="Collector.ico">
+      <Filter>기본\리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMain.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CNetServer.cpp">
+      <Filter>통신\TCP서버</Filter>
+    </ClCompile>
+    <ClCompile Include="CPipeServer.cpp">
+      <Filter>통신\파이프서버</Filter>
+    </ClCompile>
+    <ClCompile Include="CBridgeBase.cpp">
+      <Filter>통신\파이프브릿지</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainCreon.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainKiwoom.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

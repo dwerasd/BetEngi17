@@ -119,6 +119,8 @@ private:
 	void 캔들갱신();
 	void 캔들파일읽어서갱신(bool _덮어쓰기 = false);
 
+	void CreateNewCandle500(bool _덮어쓰기 = true);
+
 	bool InitCreonAPI();
 	void GetStockList();
 

@@ -251,7 +251,8 @@ bool C_MAIN::Create()
 				//거른종목벡터.push_back({ 0, (LPCSTR)"U390", (LPCSTR)"KQ150", (LPCSTR)"" });
 			}
 			퍼포먼스타이머[9].Start();
-			캔들파일읽어서갱신();
+			//캔들파일읽어서갱신();
+			CreateNewCandle500();
 			디뷰("C_MAIN::Create() - 모든 종목 업데이트 완료 %0.6f", 퍼포먼스타이머[9].TimeLeft());
 
 			char 임시텍스트버퍼[(1 << 4)] = { 0 };
@@ -709,11 +710,44 @@ void C_MAIN::GetStockList()
 		}
 		do
 		{	// 이 아래는 현물만 들어간다.
+			if ((CPUTILLib::CPC_MARKET_KOSPI == pStockInfo->장구분 || CPUTILLib::CPC_MARKET_KOSDAQ == pStockInfo->장구분))
+			{
+				if (::strstr(pStockInfo->종목명, "KODEX") || ::strstr(pStockInfo->종목명, "TIGER"))
+				{	// 코덱스와 티거는 우선 추가한다
+					거른종목벡터.push_back(모든종목벡터[i]);
+					break;
+				}
+				if (CPUTILLib::CPC_KSE_SECTION_KIND_ST != pStockInfo->nKseSectionKind)
+				{
+					break;
+				}
+				if (0 == pStockInfo->상태					// 거래중지나 거래중단을 거르고
+								//&& 0 == pStockInfo->nSupervisionType	// 관리종목 거르고
+								//&& 0 == pStockInfo->nControlType		// 정상 외 거르고
+					&& 0 == pStockInfo->스팩주				// 스팩 거르고
+					&& 0 < pStockInfo->전일종가				// 전일종가 없는건 아예 없는 STOCK_INFO.
+					)	// 거래할 종목만 메모리에 적재한다.
+				{	// 현물만
+					if (::strstr(pStockInfo->종목명, "우B")
+						|| ::strstr(pStockInfo->종목명, "3우C")
+						|| ::strstr(pStockInfo->종목명, "(전환)")
+						|| ::strstr(pStockInfo->종목명, "G3우")
+						|| ::strstr(pStockInfo->종목명, "1우")
+						|| ::strstr(pStockInfo->종목명, "홀딩스")
+						)
+					{
+						break;
+					}
+					if (17 == pStockInfo->nKseSectionKind) { break; }
+					거른종목벡터.push_back(모든종목벡터[i]);
+				}
+			}
+			/*
 			if ((CPUTILLib::CPC_MARKET_KOSPI == pStockInfo->장구분 || CPUTILLib::CPC_MARKET_KOSDAQ == pStockInfo->장구분)
-				&& CPUTILLib::CPC_KSE_SECTION_KIND_ST == pStockInfo->nKseSectionKind
+				//&& CPUTILLib::CPC_KSE_SECTION_KIND_ST == pStockInfo->nKseSectionKind
 				&& 0 == pStockInfo->상태			// 거래중지나 거래중단을 거르고
-				&& 0 == pStockInfo->nSupervisionType		// 관리종목 거르고
-				&& 0 == pStockInfo->nControlType			// 정상 외 거르고
+				//&& 0 == pStockInfo->nSupervisionType		// 관리종목 거르고
+				//&& 0 == pStockInfo->nControlType			// 정상 외 거르고
 				&& 0 == pStockInfo->스팩주					// 스팩 거르고
 				&& 0 < pStockInfo->전일종가				// 전일종가 없는건 아예 없는 종목.
 				)	// 이러면 종목이 3324개에서 2237개정도 나옴.
@@ -722,7 +756,7 @@ void C_MAIN::GetStockList()
 				//if (10 == pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
 				//if (12 == pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
 				//if (14 < pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
-				if (0 == pStockInfo->전일종가) { break; }					// 전일종가 없는건 아예 없는 종목. ( 사라진 ELW 등 )
+				//if (0 == pStockInfo->전일종가) { break; }					// 전일종가 없는건 아예 없는 종목. ( 사라진 ELW 등 )
 
 				거른종목벡터.push_back(모든종목벡터[i]);
 			}
@@ -732,22 +766,35 @@ void C_MAIN::GetStockList()
 				//{
 				//	디뷰("찾았는데?");
 				//}
-				if (!모든종목벡터[i].strName.compare("KODEX 레버리지")
-					|| !모든종목벡터[i].strName.compare("KODEX 인버스")
-					|| !모든종목벡터[i].strName.compare("KODEX 코스닥 150")
-					|| !모든종목벡터[i].strName.compare("KODEX 코스닥150 레버리지")
-					|| !모든종목벡터[i].strName.compare("KODEX 코스닥150선물인버스")
-					|| !모든종목벡터[i].strName.compare("KODEX 200")
-					|| !모든종목벡터[i].strName.compare("KODEX 200선물인버스2X")
-					|| !모든종목벡터[i].strName.compare("KODEX 코스피")
-					|| !모든종목벡터[i].strName.compare("KODEX 코스피100")
-					|| !모든종목벡터[i].strName.compare("KODEX 골드선물(H)")
-					|| !모든종목벡터[i].strName.compare("KODEX 골드선물인버스(H)")
+				if (::strstr(pStockInfo->종목명, "우B")
+					|| ::strstr(pStockInfo->종목명, "3우C")
+					|| ::strstr(pStockInfo->종목명, "(전환)")
+					|| ::strstr(pStockInfo->종목명, "G3우")
+					|| ::strstr(pStockInfo->종목명, "1우")
+					|| ::strstr(pStockInfo->종목명, "홀딩스")
 					)
 				{
-					거른종목벡터.push_back(모든종목벡터[i]);
+					break;
 				}
+				if (17 == pStockInfo->nKseSectionKind) { break; }
+				//if (!모든종목벡터[i].strName.compare("KODEX 레버리지")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 인버스")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 코스닥 150")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 코스닥150 레버리지")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 코스닥150선물인버스")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 200")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 200선물인버스2X")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 코스피")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 코스피100")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 골드선물(H)")
+				//	|| !모든종목벡터[i].strName.compare("KODEX 골드선물인버스(H)")
+				//	)
+				//{
+				//	거른종목벡터.push_back(모든종목벡터[i]);
+				//}
+				거른종목벡터.push_back(모든종목벡터[i]);
 			}
+			*/
 		} while (false);
 	}
 	거른종목벡터.push_back({ 0, (LPCSTR)"U001", (LPCSTR)"코스피", (LPCSTR)"" });
@@ -1623,13 +1670,16 @@ void C_MAIN::캔들파일읽어서갱신(bool _덮어쓰기)
 			}
 			// 끝낸 종목을 기록한다.
 			{
-				long 세이브파일상태 = dk::파일체크(세이브파일경로);
+				//long 세이브파일상태 = dk::파일체크(세이브파일경로);
 				dk::C_FILE 세이브파일(
 					세이브파일경로
 					, GENERIC_WRITE
-					, FILE_SHARE_WRITE
-					, (1 == 세이브파일상태) ? OPEN_ALWAYS : CREATE_ALWAYS
-					, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH
+					//, FILE_SHARE_WRITE
+					//, (1 == 세이브파일상태) ? OPEN_ALWAYS : CREATE_ALWAYS
+					, 0
+					, CREATE_ALWAYS																// 있어도 덮어씌운다
+					//, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH
+					, FILE_ATTRIBUTE_NORMAL// | FILE_FLAG_WRITE_THROUGH							// 캐싱하지 않고 파일에 바로 쓴다.);
 				);
 				char 저장할버퍼[(1 << 10)] = { 0 };
 				int 저장할길이 = sprintf_s(저장할버퍼, "%s\n", 종목코드);
@@ -1643,6 +1693,518 @@ void C_MAIN::캔들파일읽어서갱신(bool _덮어쓰기)
 	else
 	{
 		디뷰("C_MAIN::캔들파일읽어서갱신(end) - 장중이라 종료합니다");
+	}
+}
+
+
+void C_MAIN::CreateNewCandle500(bool _덮어쓰기)
+{
+	//WORD 캔들의길이들[] = { 1, 3, 5, 10, 15, 30, 45, 60, 130, 135, 240 };
+	WORD 캔들의길이들[] = { 1, 3, 5, 10, 15, 18, 30, 45, 60, 130, 135, 240 };
+	size_t 거른종목수 = 거른종목벡터.size();
+	std::vector<확장캔들포> 읽은캔들보관벡터;
+	std::vector<확장캔들포> 받은캔들포벡터;
+
+	dk::C_FILE 파일;
+	bool 초기세팅 = false;	// 혹시 모를 예외를 위해서 종목이 전환되면 세팅을 새로한다.
+	bool 마지막데이터갱신 = false;
+	long 파일상태 = dk::_파일없음_;
+	long 저장된마지막날짜 = 0, 저장된마지막시간 = 0, 저장된캔들수 = 0, 저장된캔들크기 = 0;
+
+	char 임시텍스트버퍼[(1 << 4)] = { 0 };
+	// 오늘날짜 파일을 읽어와서 기록된 종목들을 리스트에 담는다.
+	time_t tToday = ::time(0);
+	tm t;
+	::localtime_s(&t, &tToday);
+	::strftime(임시텍스트버퍼, 배열크기(임시텍스트버퍼), "%Y%m%d", &t);
+
+	char 세이브파일경로[_MAX_PATH] = { 0 };
+	sprintf_s(세이브파일경로, "%s%s.log", 캔들저장소.c_str(), 임시텍스트버퍼);
+	디뷰(세이브파일경로);
+
+	std::vector<std::string> 받은종목리스트;
+	{
+		long 세이브파일상태 = dk::파일체크(세이브파일경로);
+		if (1 == 세이브파일상태)
+		{	// 파일이 있으면
+			dk::C_FILE 세이브파일(세이브파일경로);
+			char 한줄버퍼[(1 << 10)] = { 0 };
+			do
+			{
+				dk::초기화(한줄버퍼, 배열크기(한줄버퍼));
+				if (0 >= 세이브파일.한줄읽기(한줄버퍼, 배열크기(한줄버퍼))) { break; }
+				//디뷰("끝낸 종목: %s", 한줄버퍼);
+				받은종목리스트.push_back(한줄버퍼);
+			} while (true);
+			세이브파일.닫기();
+		}
+	}
+	//디뷰("받은종목갯수: %d", 받은종목갯수);
+	사이즈 받은종목갯수 = 받은종목리스트.size();
+	char 캔들파일경로[_MAX_PATH] = { 0 };
+	if (!장중인가())
+	{
+		워드 분이바뀌었나 = 0;
+		퍼포먼스타이머[0].시작();
+		for (사이즈 종목인덱스 = 0; 종목인덱스 < 거른종목수; 종목인덱스++)
+		{
+			dk::DLOCAL_TIME currentTime;
+			if (currentTime.wMinute != 분이바뀌었나)
+			{	// 여기는 1분에 한번씩 들어온다.
+				if (!currentTime.wDayOfWeek || 6 == currentTime.wDayOfWeek)
+				{	// 일요일과 토요일이면
+
+				}
+				else
+				{
+					ULONG nCurrentMinute = _HM_TO_SEC_(currentTime.wHour, currentTime.wMinute);
+					if (_HM_TO_SEC_(8, 20) < nCurrentMinute
+						&& _HM_TO_SEC_(15, 31) > nCurrentMinute
+						)
+					{	// 오전 8시 20분이 지났으면 종료
+						디뷰("이 로그가 남는 경우는 평일 데이터 갱신중 오전 8시 20분이 지났을 경우이다.");
+						break;
+					}
+				}
+				분이바뀌었나 = currentTime.wMinute;
+			}
+			// 여기는 종목별 초기화 하는 부분.
+			바이트 캔들종류인덱스 = 3;						// [0]: 분봉, [1]: 일봉, [2]: 주봉, [3]: 월봉
+			long 캔들길이인덱스 = (long)배열크기(캔들의길이들);
+			워드 요청할캔들길이 = 1;
+
+			char 종목코드[(1 << 4)] = { 0 };
+			::strcpy_s(종목코드, 배열크기(종목코드), 거른종목벡터[종목인덱스].strCode.c_str());
+
+			bool 이미받음 = false;
+			for (사이즈 임시인덱스 = 0; 임시인덱스 < 받은종목갯수; 임시인덱스++)
+			{
+				//디뷰("비교: %s / %s", 종목코드, 받은종목리스트[임시인덱스].c_str());
+				if (!받은종목리스트[임시인덱스].compare(종목코드))
+				{
+					이미받음 = true;
+					break;
+				}
+			}
+			if (이미받음)
+			{
+				//디뷰("이미받음: %s", 종목코드);
+				dk::멈춰();
+				continue;
+			}
+			// 캔들파일의 경로는 종목, 종류, 길이에 따라 전부 다르다.
+			dk::초기화(캔들파일경로, 배열크기(캔들파일경로));
+
+			bool 재요청해야하는가 = false;
+			퍼포먼스타이머[1].시작();
+			do
+			{
+				if (!pCybos->GetIsConnect())
+				{
+					디뷰("크레온 플러스 접속이 끊김");
+					return;
+				}
+				요청가능확인();
+				if (!재요청해야하는가)
+				{
+					초기세팅 = false;
+					마지막데이터갱신 = false;
+					파일상태 = dk::_파일없음_;
+					저장된마지막날짜 = 0, 저장된마지막시간 = 0, 저장된캔들수 = 0;
+
+					요청할캔들길이 = 1;
+					if (!캔들종류인덱스)
+					{
+						if (!업데이트분봉) { break; }
+						if (0 > --캔들길이인덱스)
+						{
+							//디뷰("캔들길이인덱스가 0 이므로 다음종목으로 넘어간다");
+							break;
+						}
+						요청할캔들길이 = 캔들의길이들[캔들길이인덱스];
+					}
+					캔들경로세팅(캔들파일경로, 배열크기(캔들파일경로), 캔들종류인덱스, 요청할캔들길이);
+					멀바추가(캔들파일경로, 배열크기(캔들파일경로), 종목코드);	// 경로에 종목코드를 붙인다.
+					멀바추가(캔들파일경로, 배열크기(캔들파일경로), ".bet");		// 경로에 확장자를 붙인다.
+					//디뷰("[%d/%d] 경로: %s", 종목인덱스, 거른종목수, 캔들파일경로);
+					// 
+					저장된마지막날짜 = 저장된마지막시간 = 저장된캔들수 = 저장된캔들크기 = 파일상태 = 0;
+					마지막데이터갱신 = false;
+					// 파일이 있으면 읽어온다.
+					파일상태 = dk::파일체크(캔들파일경로);
+					if (dk::_파일있음_ == 파일상태)
+					{
+						//디뷰("연다: %s", 캔들파일경로);
+						파일.열기(캔들파일경로);
+						//디뷰("결과: %d / %x", 파일열기결과, 파일.GetFileData());
+						바이트포 파일내용포 = 파일.GetFileData();
+						베트파일헤더포 헤더포 = (베트파일헤더포)파일내용포;
+						if (0x0000E90C == 헤더포->nFileType)
+						{
+							//디뷰("캔들종류인덱스: %d / %d", 캔들종류인덱스, 헤더포->nStickType);
+							if (헤더포->nStickType != 캔들종류인덱스)
+							{
+								//디뷰("캔들종류인덱스가 다름 확인해야함.");
+								파일.닫기();
+								return;
+							}
+							dk::초기화(임시텍스트버퍼, 배열크기(임시텍스트버퍼));
+							switch (헤더포->nStickType)
+							{
+							case 0:
+								strcpy_s(임시텍스트버퍼, "분봉");
+								break;
+							case 1:
+								strcpy_s(임시텍스트버퍼, "일봉");
+								break;
+							case 2:
+								strcpy_s(임시텍스트버퍼, "주봉");
+								break;
+							case 3:
+								strcpy_s(임시텍스트버퍼, "월봉");
+								break;
+							case 4:
+								strcpy_s(임시텍스트버퍼, "틱봉");
+								break;
+							}
+							저장된마지막날짜 = ::ntohl(헤더포->nLastDate);
+							저장된마지막시간 = ::ntohl(헤더포->nLastTime);
+							저장된캔들수 = 헤더포->nCountSticks;
+							저장된캔들크기 = 헤더포->nStickSize;
+							if (_덮어쓰기)
+							{
+								사이즈 nPos = 크기(베트파일헤더);
+								퍼포먼스타이머[2].시작();
+								for (long 임시인덱스 = 0; 임시인덱스 < 저장된캔들수; 임시인덱스++)
+								{	// 메모리를 할당받고, 스틱을 채운다.
+									LPBET_STICK_EX 생성된캔들포 = new BET_STICK_EX();
+									생성된캔들포->초기화();
+
+									메모리복사(생성된캔들포, 저장된캔들크기, (LPBET_STICK_EX)(파일내용포 + nPos), 저장된캔들크기);
+									읽은캔들보관벡터.push_back(생성된캔들포);
+									dk::비트반전_4바이트(읽은캔들보관벡터[임시인덱스]->nDate);
+									dk::비트반전_4바이트(읽은캔들보관벡터[임시인덱스]->nTime);
+									//디뷰("%d / %d", ::ntohl(pCompany->dqSticks_Min1[i].nDate), ::ntohl(pCompany->dqSticks_Min1[i].nTime));
+									nPos += 저장된캔들크기;
+								}
+								디뷰("메모리 적재 완료 %0.6f", 퍼포먼스타이머[2].경과된시간());
+							}
+						}
+						//else
+						//{
+						//	디뷰("베트파일 아님");
+						//}
+						//디뷰("읽음: %d%s %d개 - 날짜 %d, 시간 %d", 헤더포->nStickLength, 임시텍스트버퍼, 저장된캔들수, 저장된마지막날짜, 저장된마지막시간);
+						파일.닫기();
+						if (!저장된마지막날짜 || (!캔들종류인덱스 && !저장된마지막시간) || !저장된캔들수)
+						{	// 마지막 날짜를 못 얻었으면 처음부터 저장해야한다.
+							//디뷰("헤더에서 정보를 얻지 못함, 파일을 삭제한다 %d / %d / %d / %d", 저장된마지막날짜, 저장된마지막시간, 저장된캔들수, 캔들종류인덱스);
+							do
+							{
+								if (::DeleteFileA(캔들파일경로))
+								{
+									파일상태 = dk::파일체크(캔들파일경로);
+								}
+								dk::멈춰(200);
+							} while (파일상태);
+							//디뷰("재요청모드 진행한다.");
+							재요청해야하는가 = true;	// 날짜를 못얻었으면 재요청 해야함.
+						}
+						//else
+						//{
+						//	디뷰("재요청 모드 아님.");
+						//}
+					}
+					else
+					{	// 파일이 없으면 재요청을 해야함.
+						재요청해야하는가 = true;
+					}
+				}
+				//디뷰("첫세팅 해야하는가: %d / %d", pStockChart->Continue, 초기세팅);
+				if (/*!pStockChart->Continue ||*/ !초기세팅)
+				{	// 첫 요청이면 요청사항을 세팅한다.
+					캔들요청세팅(종목코드, 캔들종류인덱스, 요청할캔들길이);
+					초기세팅 = true;
+					퍼포먼스타이머[3].시작();
+				}
+				pStockChart->BlockRequest();	// 요청한다. 캔들요청세팅을 호출하지 않으면 남은 데이터를 연속조회한다. ( 이거 한번에 1씩 소모한다. )
+				long 수신갯수 = pStockChart->GetHeaderValue(3);
+				bool 반복중단 = false;
+				if (0 < 수신갯수)
+				{	// 수신을 받았으면,
+					//디뷰("받은갯수: %d", 수신갯수);
+					for (long 캔들인덱스 = 0; 캔들인덱스 < 수신갯수; 캔들인덱스++)
+					{
+						if (반복중단)
+						{
+							//디뷰("요청중단 - 생성된 캔들 수: %d", 받은캔들포벡터.size());
+							break;
+						}
+						long 얻어온날짜 = pStockChart->GetDataValue(_날짜_, 캔들인덱스);
+						if (0 < 저장된마지막날짜)
+						{	// 저장된 날짜를 얻어왔고 (파일을 읽어왔고)
+							if (1 > 캔들종류인덱스)
+							{	// 분봉, 일봉
+								if (저장된마지막날짜 >= 얻어온날짜)	// 20211130 > 20211128 얻어온 날짜가 작으면 중단.
+								{	// 저장된 날짜보다 작거나 같으면 이미 저장된 날짜다.
+									//디뷰("날짜: %d / %d", 저장된마지막날짜, 얻어온날짜);
+									반복중단 = true;
+									continue;	// 캔들 생성하지 않는다.
+								}
+							}
+							else
+							{	// 주봉, 월봉
+								if (저장된마지막날짜 > 얻어온날짜)
+								{	// 이미 저장된게 있을 수 있으니 for문만 나가서 다음종목으로
+									//디뷰("여기 오긴 오나? 날짜: %d / %d", 저장된마지막날짜, 날짜);
+									break;
+								}
+								if (저장된마지막날짜 == 얻어온날짜)
+								{	// 같으면 마지막 데이터 최신값으로 업데이트.
+									//디뷰("마지막데이터 갱신: %d", 날짜);
+									마지막데이터갱신 = true;
+								}
+								반복중단 = true;	// 캔들 생성을 진행한다
+							}
+						}
+						LPBET_STICK_EX 생성된캔들포 = new BET_STICK_EX();
+						if (생성된캔들포)
+						{
+							생성된캔들포->초기화();
+							생성된캔들포->nDate = 얻어온날짜;
+							// 지수는 일자, 시간, 시고저종만 기록한다.
+							생성된캔들포->nTime = pStockChart->GetDataValue(_시간_, 캔들인덱스);
+							생성된캔들포->fOpen = (플롯)pStockChart->GetDataValue(_시가_, 캔들인덱스);
+							생성된캔들포->fHigh = (플롯)pStockChart->GetDataValue(_고가_, 캔들인덱스);
+							생성된캔들포->fLow = (플롯)pStockChart->GetDataValue(_저가_, 캔들인덱스);
+							생성된캔들포->fClose = (플롯)pStockChart->GetDataValue(_종가_, 캔들인덱스);
+							if (4 < 거른종목벡터[종목인덱스].strCode.length())
+							{
+								생성된캔들포->nTotalVolume = pStockChart->GetDataValue(_거래량_, 캔들인덱스);
+								생성된캔들포->nTransferPayment = pStockChart->GetDataValue(_거래대금_, 캔들인덱스);
+								if (0 == 캔들종류인덱스)
+								{	// 분봉, 틱봉이면 누적체결 수량도 기록한다.
+									생성된캔들포->누적매도체결량 = pStockChart->GetDataValue(_누적체결_매도수량_, 캔들인덱스);
+									생성된캔들포->누적매수체결량 = pStockChart->GetDataValue(_누적체결_매수수량_, 캔들인덱스);
+								}
+							}
+							받은캔들포벡터.push_back(생성된캔들포);	// 배열에 매우 담는다
+						}
+						//else
+						//{
+						//	디뷰("메모리할당 실패");
+						//}
+					}
+				}
+				else
+				{
+					디뷰("[%s] 받은게 없음(실패) 요청: %c", 종목코드, 캔들종류인덱스);
+				}
+				//if (!pStockChart->Continue									// 더 요청할 수 있는 데이터가 없거나
+				//	|| !재요청해야하는가									// 재요청 할 필요 없으면 저장하고 끝냄.
+				//	)
+				{	// 이제 데이터를 정렬해서 저장하도록 하자.
+					사이즈 저장할캔들수 = 받은캔들포벡터.size();
+					if (0 < 저장할캔들수)
+					{	// 헤더부터 쓴다.
+						//디뷰("저장할캔들수: %d", 저장할캔들수);
+						dk::초기화(대용량임시버퍼_시작포인터, 힙크기(대용량임시버퍼_시작포인터));
+						대용량임시버퍼_유동포인터 = 대용량임시버퍼_시작포인터;						// 포인터 초기화
+						베트파일헤더포 헤더포 = (베트파일헤더포)대용량임시버퍼_유동포인터;
+						헤더포->nFileType = 0x0000E90C;
+						헤더포->nFileStyle = 0x00000001;
+						헤더포->nStockExchange = 1;			// 크레온
+						멀바복사(헤더포->크레온코드, 배열크기(헤더포->크레온코드), 종목코드);
+						멀바복사(헤더포->풀코드, 배열크기(헤더포->풀코드), 거른종목벡터[종목인덱스].strFullCode.c_str());
+						멀바복사(헤더포->종목코드, 배열크기(헤더포->종목코드), &헤더포->크레온코드[1]);
+						헤더포->nStickType = 캔들종류인덱스;
+						헤더포->nStickLength = 요청할캔들길이;
+						헤더포->nStickSize = 확장캔들사용 ? 크기(BET_STICK_EX) : 크기(BET_STICK_DATAF);
+
+						if (1 == 저장할캔들수)
+						{	// 오늘 것만
+							if (!마지막데이터갱신)
+							{	// 붙인다.
+								헤더포->nCountSticks = 저장된캔들수++;
+								//디뷰("1개 붙인다");
+							}
+							else
+							{	// 업데이트 한다.
+								헤더포->nCountSticks = 저장된캔들수;	// 파일 헤더의 캔들수를 증가하지 않음.
+								//디뷰("1개 갱신한다");
+							}
+						}
+						else// if (1 < 저장할캔들수)
+						{	// 가장 최근 데이터가 [0] 에 있으므로 순서를 뒤집는다.
+							std::reverse(받은캔들포벡터.begin(), 받은캔들포벡터.end());
+							헤더포->nCountSticks = 저장된캔들수 + 저장할캔들수;
+							//디뷰("%d개 붙인다", 저장할캔들수);
+						}
+						//else
+						//{	// 여기는 오면 안되는거라 로그만 남겨볼까
+						//	디뷰("받은 캔들정리중 - 여기는 오면 안됨");
+						//}
+						// ntohl 함수는 변수안의 내용은 놔두고 결과를 리턴만 한다.
+						헤더포->nLastDate = ::ntohl(받은캔들포벡터[저장할캔들수 - 1]->nDate);
+						if (0 < 받은캔들포벡터[저장할캔들수 - 1]->nTime)
+						{
+							헤더포->nLastTime = ::ntohl(받은캔들포벡터[저장할캔들수 - 1]->nTime);
+						}
+						// 잉여버퍼의 포인터를 헤더 다음으로 이동.
+						대용량임시버퍼_유동포인터 += 크기(베트파일헤더);
+						if (_덮어쓰기)
+						{	// 파일로 읽어온걸 잉여버퍼에 복사한다.
+							사이즈 읽은캔들수 = 읽은캔들보관벡터.size();
+							for (사이즈 인덱스 = 0; 인덱스 < 읽은캔들수; 인덱스++)
+							{
+								확장캔들포 임시캔들포인터 = 읽은캔들보관벡터[인덱스];
+								dk::비트반전_4바이트(임시캔들포인터->nDate);	// dk::ntohl 함수는 변수 안의 내용도 변경한다.
+								if (0 < 임시캔들포인터->nTime)
+								{	// 시간이 있으면 분봉이다.
+									dk::비트반전_4바이트(임시캔들포인터->nTime);
+								}
+								메모리복사(대용량임시버퍼_유동포인터, 헤더포->nStickSize, 임시캔들포인터, 헤더포->nStickSize);
+								대용량임시버퍼_유동포인터 += 헤더포->nStickSize;
+							}
+						}
+						for (사이즈 인덱스 = 0; 인덱스 < 저장할캔들수; 인덱스++)
+						{	// 얻어온 내용들을 잉여버퍼에 복사하는거다.
+							확장캔들포 임시캔들포인터 = 받은캔들포벡터[인덱스];
+							dk::비트반전_4바이트(임시캔들포인터->nDate);		// dk::ntohl 함수는 변수 안의 내용도 변경한다.
+							if (0 < 임시캔들포인터->nTime)
+							{	// 시간이 있으면 분봉이다.
+								임시캔들포인터->nTime *= 1000000;
+								dk::비트반전_4바이트(임시캔들포인터->nTime);
+							}
+							메모리복사(대용량임시버퍼_유동포인터, 헤더포->nStickSize, 임시캔들포인터, 헤더포->nStickSize);
+							대용량임시버퍼_유동포인터 += 헤더포->nStickSize;
+						}
+
+						사이즈 저장할데이터의크기 = (대용량임시버퍼_유동포인터 - 대용량임시버퍼_시작포인터);
+						// 캔들을 임시버퍼로 모두 복사한거다.
+						파일.열기(캔들파일경로, GENERIC_READ | GENERIC_WRITE, 0, 파일상태 ? OPEN_EXISTING : CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH);
+						if (_덮어쓰기)
+						{	// 헤더와 내용 몽땅 그냥 덮어쓴다.
+							파일.처음에가서쓰기(대용량임시버퍼_시작포인터, 저장할데이터의크기);
+						}
+						else
+						{
+							파일.처음에가서쓰기(헤더포, 크기(베트파일헤더));
+							// 헤더는 썼으니까 크기에서 헤더크기를 빼준다.
+							저장할데이터의크기 -= 크기(베트파일헤더);
+							if (!마지막데이터갱신)
+							{	// 붙이기 하는 경우, 임시버퍼에서 헤더사이즈를 더한곳부터 캔들데이터다.
+								파일.쓰기(대용량임시버퍼_시작포인터 + 크기(베트파일헤더), 저장할데이터의크기);
+							}
+							else
+							{	// 업데이트 하는 경우.
+								디워드 마지막데이터의위치 = 파일.파일크기() - 저장할데이터의크기;
+								파일.위치이동(마지막데이터의위치);
+								파일.현재위치에쓰기(대용량임시버퍼_시작포인터 + 크기(베트파일헤더), 저장할데이터의크기);
+							}
+						}
+						//디뷰("파일을 닫는다");
+						파일.닫기();
+						if (2 > 접속서버)
+						{
+							디뷰("[%d/%d] %s %d개(%d), 경로: [%s] - %0.6f"
+								, 종목인덱스 + 1
+								, 거른종목수
+								, 마지막데이터갱신 ? "갱신" : "추가"
+								, 저장할캔들수
+								, 저장할데이터의크기
+								, 캔들파일경로
+								, 퍼포먼스타이머[3].경과된시간()
+							);
+						}
+						else
+						{
+							CMDPRINT("[%d/%d] %s %d개(%d), 경로: [%s] - %0.6f"
+								, 종목인덱스 + 1
+								, 거른종목수
+								, 마지막데이터갱신 ? "갱신" : "추가"
+								, 저장할캔들수
+								, 저장할데이터의크기
+								, 캔들파일경로
+								, 퍼포먼스타이머[3].경과된시간()
+							);
+						}
+						// 벡터에 할당된 메모리는 new 로 각자 할당받은거라 수동으로 해제해야한다.
+						if (_덮어쓰기)
+						{
+							//for (사이즈 i = 0; i < 읽은캔들보관벡터.size(); i++) { 메모리해제(읽은캔들보관벡터[i]); } 
+							//읽은캔들보관벡터.clear();
+							벡터초기화(읽은캔들보관벡터);
+						}
+						// 이 부분을 나중에 연속된 메모리를 할당하고 한번에 해제하도록 메모리풀을 만들어야한다.
+						//for (사이즈 i = 0; i < 저장할캔들수; i++) { 메모리해제(받은캔들포벡터[i]); }
+						//받은캔들포벡터.clear();	// 주소들만 보관된거라서 clear 하면 된다.
+						벡터초기화(받은캔들포벡터);
+
+						if (0 < 캔들종류인덱스)
+						{
+							캔들종류인덱스--;
+						}
+						재요청해야하는가 = false;
+					}
+					else
+					{	// 저장할 캔들이 없는것.
+						if (_덮어쓰기)
+						{
+							//for (사이즈 i = 0; i < 읽은캔들보관벡터.size(); i++) { 메모리해제(읽은캔들보관벡터[i]); }
+							//읽은캔들보관벡터.clear();
+							벡터초기화(읽은캔들보관벡터);
+						}
+						사이즈 벡터크기 = 받은캔들포벡터.size();
+						if (0 < 벡터크기)
+						{	// 이 부분을 나중에 연속된 메모리를 할당하고 한번에 해제하도록 메모리풀을 만들어야한다.
+							//for (사이즈 i = 0; i < 벡터크기; i++) { 메모리해제(받은캔들포벡터[i]); }
+							//받은캔들포벡터.clear();	// 주소들만 보관된거라서 clear 하면 된다.
+							벡터초기화(받은캔들포벡터);
+						}
+						디뷰("추가 또는 갱신할 캔들이 없음.");
+						if (0 < 캔들종류인덱스)
+						{
+							캔들종류인덱스--;
+						}
+						재요청해야하는가 = false;
+					}
+					//break;	// 해당 종목을 빠져나가면 안되네.
+				}
+			} while (true);
+			if (2 > 접속서버)
+			{
+				디뷰(">>> 종목 한개 걸린시간: %0.6f초 ", 퍼포먼스타이머[1].경과된시간());
+			}
+			else
+			{
+				CMDPRINT(">>> 종목 한개 걸린시간: %0.6f초 ", 퍼포먼스타이머[1].경과된시간());
+			}
+			// 끝낸 종목을 기록한다.
+			{
+				long 세이브파일상태 = dk::파일체크(세이브파일경로);
+				dk::C_FILE 세이브파일(
+					세이브파일경로
+					, GENERIC_WRITE
+					, FILE_SHARE_WRITE
+					, (1 == 세이브파일상태) ? OPEN_ALWAYS : CREATE_ALWAYS
+					//, 0
+					//, CREATE_ALWAYS																// 있어도 덮어씌운다
+					, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH
+					//, FILE_ATTRIBUTE_NORMAL// | FILE_FLAG_WRITE_THROUGH							// 캐싱하지 않고 파일에 바로 쓴다.);
+				);
+				char 저장할버퍼[(1 << 10)] = { 0 };
+				int 저장할길이 = sprintf_s(저장할버퍼, "%s\n", 종목코드);
+				세이브파일.쓰기(저장할버퍼, 저장할길이);
+				세이브파일.닫기();
+			}
+
+		}
+		디뷰("C_MAIN::CreateNewCandle500(end): %0.6f", 퍼포먼스타이머[0].경과된시간());
+	}
+	else
+	{
+		디뷰("C_MAIN::CreateNewCandle500(end) - 장중이라 종료합니다");
 	}
 }
 

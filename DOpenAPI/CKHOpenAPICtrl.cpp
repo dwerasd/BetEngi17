@@ -195,6 +195,14 @@ CStringA C_KH_OPEN_API::GetCommData(LPCSTR strTrCode, LPCSTR strRecordName, long
 	InvokeHelper(0x18, DISPATCH_METHOD, VT_BSTR, (void*)&result, parms, strTrCode, strRecordName, nIndex, strItemName);
 	return(result);
 }
+LPCSTR C_KH_OPEN_API::GetCommDataEx(LPSTR _pBuffer, size_t _nBufferSize, LPCSTR strTrCode, LPCSTR strRecordName, long nIndex, LPCSTR strItemName)
+{
+	static BYTE parms[] = VTS_BSTR VTS_BSTR VTS_I4 VTS_BSTR;
+	CStringA result;
+	InvokeHelper(0x18, DISPATCH_METHOD, VT_BSTR, (void*)&result, parms, strTrCode, strRecordName, nIndex, strItemName);
+	::strcpy_s(_pBuffer, _nBufferSize, result.GetBuffer());
+	return(_pBuffer);
+}
 CStringA C_KH_OPEN_API::GetCommRealData(LPCSTR sTrCode, long nFid)
 {
 	static BYTE parms[] = VTS_BSTR VTS_I4;
@@ -202,6 +210,16 @@ CStringA C_KH_OPEN_API::GetCommRealData(LPCSTR sTrCode, long nFid)
 	InvokeHelper(0x19, DISPATCH_METHOD, VT_BSTR, (void*)&result, parms, sTrCode, nFid);
 	return(result);
 }
+
+LPCSTR C_KH_OPEN_API::GetCommRealDataEx(LPSTR _pBuffer, size_t _nBufferSize, LPCSTR _sRealKey, long _Field)
+{
+	static BYTE parms[] = VTS_BSTR VTS_I4;
+	CStringA result;
+	InvokeHelper(0x19, DISPATCH_METHOD, VT_BSTR, (void*)&result, parms, _sRealKey, _Field);
+	::strcpy_s(_pBuffer, _nBufferSize, result.GetBuffer());
+	return(_pBuffer);
+}
+
 CStringA C_KH_OPEN_API::GetChejanData(long nFid)
 {
 	static BYTE parms[] = VTS_I4;

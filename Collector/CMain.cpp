@@ -4,6 +4,9 @@
 
 
 static C_MAIN* pMain = nullptr;
+LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData);
+LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData);
+
 LRESULT CALLBACK WndProc(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam)
 {
 	static C_MAIN* pWindow = nullptr;
@@ -44,7 +47,7 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 		pMain->ShowWindow(false);
 		return(true);
 	case WM_INITDIALOG:
-		::SendMessageW(_hWnd, WM_SETICON, ICON_BIG, (LPARAM)LoadIconW(::GetModuleHandleW(0), MAKEINTRESOURCEW(IDI_BETSERV)));
+		::SendMessageW(_hWnd, WM_SETICON, ICON_BIG, (LPARAM)LoadIconW(::GetModuleHandleW(0), MAKEINTRESOURCEW(IDI_COLLECTOR)));
 		//::SendMessageW(::GetDlgItem(_hWnd, IDC_RADIO_TEST), BM_SETCHECK, BST_CHECKED, 0);
 		return(true);
 	case WM_COMMAND:
@@ -55,6 +58,7 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 			pMain->ShowWindow(false);
 			pMain->bHighPerformance = true;
 			break;
+			/*
 		case ID_BTN_SAVE:
 			do
 			{
@@ -92,6 +96,7 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 		case ID_BTN_SAVE_CSV:
 
 			break;
+			*/
 		case IDM_EXIT:
 			::EndDialog(_hWnd, 0);
 			디뷰("종료");
@@ -163,7 +168,8 @@ C_MAIN::C_MAIN(HINSTANCE _hInst)
 
 C_MAIN::~C_MAIN()
 {
-	DSAFE_DELETE(pMemDB);
+	DSAFE_DELETE(pBridgeCreon);
+	DSAFE_DELETE(pBridgeKiwoom);
 }
 
 static wchar_t wszWindowName[(1 << 7)] = { 0 };
@@ -196,14 +202,12 @@ bool C_MAIN::Init(LPCWSTR _wszClassName, LPCWSTR _wszWindowName, bool _bWindowMo
 		메인윈도우크기.cy = ::GetPrivateProfileIntA("location", "h", 800, 설정파일.c_str());
 
 		// 콜백 세팅 떄문에 여기서 생성하도록 한다.
-		DSAFE_DELETE(pMemDB);
-		pMemDB = new C_MEMDB();
-
+		
 		::tagWNDCLASSEXW wcex = { sizeof(::tagWNDCLASSEXW), 0 };
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = WndProc;
 		wcex.hInstance = hInst;
-		wcex.hIcon = ::LoadIconW(hInst, MAKEINTRESOURCEW(IDI_BETSERV));
+		wcex.hIcon = ::LoadIconW(hInst, MAKEINTRESOURCEW(IDI_COLLECTOR));
 		wcex.hCursor = ::LoadCursorW(nullptr, IDC_ARROW);
 		//wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wcex.hbrBackground = (HBRUSH)::GetStockObject(GRAY_BRUSH);
@@ -247,13 +251,23 @@ bool C_MAIN::Create()
 		);
 		if (!hWnd) { break; }
 		// 트레이 아이콘 만들고
-		pTrayIcon = new dk::C_TRAY_ICON(hWnd, WM_TRAYICON, wszWindowName, ::LoadIconW(hInst, (LPCWSTR)IDI_BETSERV), IDI_BETSERV);
+		pTrayIcon = new dk::C_TRAY_ICON(hWnd, WM_TRAYICON, wszWindowName, ::LoadIconW(hInst, (LPCWSTR)IDI_COLLECTOR), IDI_COLLECTOR);
 
 		this->ThreadStart();
 
 		bShowWindow = true;
-		//::ShowWindow(hWnd, SW_SHOWNORMAL);
-		//::UpdateWindow(hWnd);
+		
+		if (!pBridgeCreon)
+		{
+			pBridgeCreon = new C_BRIDGE_BASE(BridgeCallbackCreon, L"PipeCollectServerCreon", L"PipeCollectClientCreon");
+			pBridgeCreon->Init("DCreonAPI.exe");
+		}
+		if (!pBridgeKiwoom)
+		{	// 키움 실행을 누르면 생성하는걸로 하자.
+			pBridgeKiwoom = new C_BRIDGE_BASE(BridgeCallbackKiwoom, L"PipeCollectServerKiwoom", L"PipeCollectClientKiwoom");
+			pBridgeKiwoom->Init("DOpenAPI.exe");
+		}
+
 
 		hDlgMain = ::CreateDialogParamW(hInst, MAKEINTRESOURCEW(IDD_MAIN), NULL, (DLGPROC)DlgProcMain, 0);
 		::SetWindowPos(hDlgMain, NULL, 메인윈도우위치.x, 메인윈도우위치.y, 메인윈도우크기.cx, 메인윈도우크기.cy, SWP_NOSIZE);
@@ -283,7 +297,7 @@ long C_MAIN::Calculate()
 		}
 		if (bShowWindow)
 		{
-			
+
 		}
 		nFrame++;
 		if (!bHighPerformance)
@@ -297,6 +311,7 @@ void C_MAIN::Display()
 {
 
 }
+
 void C_MAIN::Destroy() noexcept
 {
 	{	// 경로 저장.
@@ -318,7 +333,10 @@ void C_MAIN::Destroy() noexcept
 	}
 	::DestroyWindow(hWnd);
 	::UnregisterClassW(pClassName, hInst);
-	DSAFE_DELETE(pMemDB);
+	
+	DSAFE_DELETE(pBridgeCreon);
+	DSAFE_DELETE(pBridgeKiwoom);
+
 	bExitProcess = true;
 	DSAFE_DELETE(pTrayIcon);
 }
@@ -336,7 +354,7 @@ bool C_MAIN::OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 		}
 		return(true);
 	case WM_TRAYICON:
-		if (IDI_BETSERV == _wParam)
+		if (IDI_COLLECTOR == _wParam)
 		{
 			if (WM_LBUTTONDBLCLK == LOWORD(_lParam))
 			{	// 더블클릭 하면 윈도우를 보여준다.
@@ -425,80 +443,6 @@ LPTICK_DATA C_MAIN::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 	return(pTickData);
 }
 
-LPTICK_DATAEX C_MAIN::AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook)
-{	// 일단 틱 데이터를 연속된 메모리에 변환해서 쌓는다.
-	LPTICK_DATAEX pTickDataEx = nullptr;
-	if (pTickBuffer)
-	{
-		pTickDataEx = (LPTICK_DATAEX)pTickBufferPtr;
-		::memset(pTickDataEx, 0, sizeof(TICK_DATAEX));
-
-		pTickDataEx->nSequence = nCountAccrueTick++;	// 더하고 증가, 순서는 0부터 기록한다.
-		// 코드는 복사, 7바이트 문자배열이라 제로 메모리는 굳이 안쓴다.
-		::strncpy_s(pTickDataEx->szCode, _countof(pTickDataEx->szCode) * sizeof(char), _pData->종목코드, 6);
-		pTickDataEx->szCode[6] = 0;
-		// 이 함수가 호출된 시스템 시간을 얻어온다.
-		dk::DLOCAL_TIME currentTime;
-		// 밀리초를 더한다. ( 시간 변환은 여기서 저장용으로 한번만 한다.
-		char szTime[(1 << 4)] = { 0 };
-		// 아직 저장할게 아니니까 endian 변환은 하지 않는다.
-		//sprintf_s(szTime, "%08x", (::atoi(_szTime) * 1000) + cur_time.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
-		//pTickDataEx->nTime = ::ntohl(::strtol(szTime, NULL, 16));
-		sprintf_s(szTime, "%d", (::atoi(_pData->체결시간) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
-		pTickDataEx->nTime = ::atoi(szTime);
-
-		// 매수 매도인지 여기서 판단 후에 종목에 넘겨주도록 하자.
-		if ('+' == _pData->체결량[0]) { pTickDataEx->nTransType = 1; }		// 매수 체결
-		else if ('-' == _pData->체결량[0]) { pTickDataEx->nTransType = 2; }	// 매도체결
-		else
-		{	/*
-			// 단일가 매매의 경우 전일 종가와 비교해 부호가 붙는다.
-			if ('+' == _szClose[0])
-			{
-				pTickDataEx->nTransType = 4;
-			}
-			else if ('-' == _szClose[0])
-			{
-				pTickDataEx->nTransType = 5;
-			}
-			else
-			*/
-			{
-				pTickDataEx->nTransType = 3;	// 전일종가와 동일할 경우
-			}
-		}
-		// 부호가 붙어 있으면 무시하고 숫자만 변환
-		pTickDataEx->fPrice = (float)dk::atoi_s(_pData->체결가);
-		pTickDataEx->nTransVolume = dk::atoi_s(_pData->체결량);
-		pTickDataEx->nAccrueVolume = dk::atoi_s(_pData->누적거래량);
-		pTickDataEx->최우선매도호가 = (float)dk::atoi_s(_pData->최우선매도호가);
-		pTickDataEx->최우선매수호가 = (float)dk::atoi_s(_pData->최우선매수호가);
-
-
-		pTickDataEx->시가 = dk::atoi_s(_pData->szOpen);
-		pTickDataEx->고가 = dk::atoi_s(_pData->szHigh);
-		pTickDataEx->저가 = dk::atoi_s(_pData->szLow);
-
-		pTickDataEx->누적거래대금 = dk::atoi_s(_pData->누적거래대금);
-		pTickDataEx->시가총액_억 = dk::atoi_s(_pData->시가총액);
-
-		pTickDataEx->등락율 = (float)dk::atoi_s(_pData->등락율);
-		pTickDataEx->전일거래량대비_비율 = (float)dk::atoi_s(_pData->전일거래량대비);
-		pTickDataEx->거래회전율 = (float)dk::atoi_s(_pData->거래회전율);
-		pTickDataEx->체결강도 = (float)dk::atoi_s(_pData->체결강도);
-		pTickDataEx->전일동시간거래량비율 = (float)dk::atoi_s(_pData->전일동시간거래량비율);
-		if (_pOrderBook)
-		{
-			pTickDataEx->매도호가총잔량 = _pOrderBook->매도호가총잔량;
-			pTickDataEx->매수호가총잔량 = _pOrderBook->매수호가총잔량;
-			pTickDataEx->매도비율 = _pOrderBook->매도비율;
-		}
-		//디뷰("%d / %d", pTickDataEx->nTransVolume, pTickDataEx->nAccrueVolume);	// 왜 이걸 안쓰면 누락이 발생하는거지
-		pTickBufferPtr += sizeof(TICK_DATAEX);	// 채운만큼 포인터 이동
-	}
-	return(pTickDataEx);
-}
-
 DWORD C_MAIN::ThreadFunc(LPVOID _pParam)
 {
 	DBGPRINT("C_NET_SERVER::ThreadFunc() - 네트워크 패킷 처리 스레드");
@@ -543,7 +487,7 @@ DWORD C_MAIN::ThreadFunc(LPVOID _pParam)
 							DBGPRINT("C_NET_SERVER::ThreadFunc() - 받음(_PKT_INDEX_NONE): %d", pNetPacket->nPacketIndex);
 							break;
 						case _PKT_NET_CONNECTED_:
-							
+
 							DBGPRINT("C_NET_SERVER::ThreadFunc() - 받음(_PKT_NET_CONNECTED_): %s / 세션: %x", pNetPacket->bytBuffer, pNetPacketBundle->pSession);
 							{	// 접속 패킷을 받으면 같은 헤더로 "_PKT_NET_CONNECTED_" 라는 문자열까지 보내준다.
 								char szBuffer[] = "_PKT_NET_CONNECTED_";
@@ -554,35 +498,7 @@ DWORD C_MAIN::ThreadFunc(LPVOID _pParam)
 							pSession->Shutdown();
 							break;
 						case _네트워크패킷_키움_주식체결_:
-							do
-							{
-								LPKIWOOM_REALDATA_TRANSACTION pData = (LPKIWOOM_REALDATA_TRANSACTION)pNetPacket->bytBuffer;
-								LPORDERBOOK_KIWOOM pStock = 키움호가데이터[pData->종목코드];
-								if (!pStock)
-								{	// 아직 저장된적 없는 종목이니 생성함.
-									pStock = 키움호가데이터[pData->종목코드] = new ORDERBOOK_KIWOOM();
-									::memset(pStock, 0, sizeof(ORDERBOOK_KIWOOM));
-								}
-								//AppendTick(pData);
-								AppendTickEx(pData, pStock);
-							} while (false);
-							break;
-						case _네트워크패킷_키움_주식호가잔량_:
-							do
-							{
-								키움_주식호가잔량포 pData = (키움_주식호가잔량포)pNetPacket->bytBuffer;
-
-								LPORDERBOOK_KIWOOM pOrderBook = 키움호가데이터[pData->종목코드];
-								if (!pOrderBook)
-								{	// 아직 저장된적 없는 종목이니 생성함.
-									pOrderBook = 키움호가데이터[pData->종목코드] = new ORDERBOOK_KIWOOM();
-								}
-								::strcpy_s(pOrderBook->종목코드, pData->종목코드);
-								pOrderBook->매도호가총잔량 = ::atoi(pData->매도호가총잔량);
-								pOrderBook->매수호가총잔량 = ::atoi(pData->매수호가총잔량);
-								pOrderBook->매도비율 = (float)::atof(pData->매도비율);
-							} while (false);
-							
+							AppendTick((LPKIWOOM_REALDATA_TRANSACTION)pNetPacket->bytBuffer);
 							break;
 						case _PKT_NET_RECEIVE_STOCKINFO_KIWOOM_:
 							do

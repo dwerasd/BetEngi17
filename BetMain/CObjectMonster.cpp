@@ -115,7 +115,7 @@ void C_OBJECT_MONSTER::InitSticks()
 
 }
 
-void C_OBJECT_MONSTER::PushTick(LPTICK_DATA _pTick)
+void C_OBJECT_MONSTER::PushTick(LPTICK_DATAEX _pTick)
 {	// 여기는 파일에서 읽은게 들어오는거다.
 	// 위에서 pStock 가 없으면 생성하므로 분기를 제거.
 	//try

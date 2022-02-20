@@ -132,15 +132,25 @@ void C_KH_OPEN_API::OnReceiveTrData(LPCSTR _sScrNum, LPCSTR sRQName, LPCSTR sTrC
 	sSplmMsg;
 	try
 	{
-		PACKET_BASE packet;
+		
 		if (!::strcmp(_TR_OPW00001_, sTrCode))
 		{	// 예수금상세현황요청
-			키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)&packet.bytBuffer[0];
-			현황포->예수금 = ::_atoi64(GetCommData(sTrCode, "예수금상세현황", 0, "예수금").GetBuffer());
-			현황포->출금가능금액 = ::_atoi64(GetCommData(sTrCode, "예수금상세현황", 0, "출금가능금액").GetBuffer());
-			현황포->주문가능금액 = ::_atoi64(GetCommData(sTrCode, "예수금상세현황", 0, "주문가능금액").GetBuffer());
-			packet.nPacketSize = sizeof(키움_예수금상세현황);
-			packet.nPacketIndex = _브릿지패킷_키움_예수금상세현황받음_;
+			PACKET_BASE packet =
+			{	// 메모리 할당과 복사를 한번만 하기 위해 여기에서 PACKET_BASE 를 할당한다.
+				sizeof(키움_예수금상세현황)
+				, _브릿지패킷_키움_예수금상세현황받음_
+				, { 0 }
+			};
+			키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)packet.bytBuffer;
+			char 임시버퍼[(1 << 4)] = { 0 };
+			현황포->예수금 = ::_atoi64(GetCommDataEx(임시버퍼, _countof(임시버퍼), sTrCode, "예수금상세현황", 0, "예수금"));
+
+			::memset(임시버퍼, 0, _countof(임시버퍼));
+			현황포->출금가능금액 = ::_atoi64(GetCommDataEx(임시버퍼, _countof(임시버퍼), sTrCode, "예수금상세현황", 0, "출금가능금액"));
+
+			::memset(임시버퍼, 0, _countof(임시버퍼));
+			현황포->주문가능금액 = ::_atoi64(GetCommDataEx(임시버퍼, _countof(임시버퍼), sTrCode, "예수금상세현황", 0, "주문가능금액"));
+			
 			if (pPipe) { pPipe->Send(&packet); }
 		}
 	}
@@ -162,18 +172,6 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 	{
 		if (!::strcmp(_sRealType, "주식체결"))
 		{	// 보낼 데이터를 문자열로 뽑는다
-			CStringA strClose = GetCommRealData(_sRealKey, 10);			// 현재가
-			CStringA strAccrueVolume = GetCommRealData(_sRealKey, 13);	// 누적거래량은 누락 확인을 위해
-			CStringA strAccruePayment = GetCommRealData(_sRealKey, 14);	// 누적거래대금
-			CStringA strVolume = GetCommRealData(_sRealKey, 15);		// 거래량
-			CStringA strOpen = GetCommRealData(_sRealKey, 16);			// 시가
-			CStringA strHigh = GetCommRealData(_sRealKey, 17);			// 고가
-			CStringA strLow = GetCommRealData(_sRealKey, 18);			// 저가
-			CStringA strTime = GetCommRealData(_sRealKey, 20);			// 체결시간
-			CStringA strPriceSell = GetCommRealData(_sRealKey, 27);		// 최우선매도호가
-			CStringA strPriceBuy = GetCommRealData(_sRealKey, 28);		// 최우선매수호가
-			CStringA strStrength = GetCommRealData(_sRealKey, 228);		// 체결강도
-
 			PACKET_BASE packet =
 			{	// 메모리 할당과 복사를 한번만 하기 위해 여기에서 PACKET_BASE 를 할당한다.
 				sizeof(KIWOOM_REALDATA_TRANSACTION)
@@ -182,36 +180,56 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			};
 			LPKIWOOM_REALDATA_TRANSACTION pData = (LPKIWOOM_REALDATA_TRANSACTION)&packet.bytBuffer[0];
 			pData->nRealType = _키움_주식체결_;
-			::strcpy_s(pData->szStockCode, sizeof(pData->szStockCode), _sRealKey);
-			::strcpy_s(pData->szTime, sizeof(pData->szTime), strTime.GetBuffer());
-			::strcpy_s(pData->szClose, sizeof(pData->szClose), strClose.GetBuffer());
-			::strcpy_s(pData->szVolume, sizeof(pData->szVolume), strVolume.GetBuffer());
-			::strcpy_s(pData->szAccrueVolume, sizeof(pData->szAccrueVolume), strAccrueVolume.GetBuffer());
-			::strcpy_s(pData->szOpen, sizeof(pData->szOpen), strOpen.GetBuffer());
-			::strcpy_s(pData->szHigh, sizeof(pData->szHigh), strHigh.GetBuffer());
-			::strcpy_s(pData->szLow, sizeof(pData->szLow), strLow.GetBuffer());
-			::strcpy_s(pData->szPriceSell, sizeof(pData->szPriceSell), strPriceSell.GetBuffer());
-			::strcpy_s(pData->szPriceBuy, sizeof(pData->szPriceBuy), strPriceBuy.GetBuffer());
-			::strcpy_s(pData->szStrength, sizeof(pData->szStrength), strStrength.GetBuffer());
+			::strcpy_s(pData->종목코드, sizeof(pData->종목코드), _sRealKey);										// 종목코드
+
+			GetCommRealDataEx(pData->체결가, _countof(pData->체결가), _sRealKey, 10);								// 체결가
+			GetCommRealDataEx(pData->등락율, _countof(pData->등락율), _sRealKey, 12);								// 등락율
+			GetCommRealDataEx(pData->누적거래량, _countof(pData->누적거래량), _sRealKey, 13);						// 누적거래량
+			GetCommRealDataEx(pData->누적거래대금, _countof(pData->누적거래대금), _sRealKey, 14);					// 누적거래대금
+			GetCommRealDataEx(pData->체결량, _countof(pData->체결량), _sRealKey, 15);								// 체결량
+
+			GetCommRealDataEx(pData->szOpen, _countof(pData->szOpen), _sRealKey, 16);								// 당일시가
+			GetCommRealDataEx(pData->szHigh, _countof(pData->szHigh), _sRealKey, 17);								// 당일고가
+			GetCommRealDataEx(pData->szLow, _countof(pData->szLow), _sRealKey, 18);									// 당일저가
+
+			GetCommRealDataEx(pData->체결시간, _countof(pData->체결시간), _sRealKey, 20);							// 체결시간
+			GetCommRealDataEx(pData->최우선매도호가, _countof(pData->최우선매도호가), _sRealKey, 27);				// 최우선매도호가
+			GetCommRealDataEx(pData->최우선매수호가, _countof(pData->최우선매수호가), _sRealKey, 28);				// 최우선매수호가
+			GetCommRealDataEx(pData->전일거래량대비, _countof(pData->전일거래량대비), _sRealKey, 30);				// 전일거래량대비
+
+			GetCommRealDataEx(pData->거래회전율, _countof(pData->거래회전율), _sRealKey, 31);						// 거래회전율
+			GetCommRealDataEx(pData->체결강도, _countof(pData->체결강도), _sRealKey, 228);							// 체결강도
+			GetCommRealDataEx(pData->시가총액, _countof(pData->시가총액), _sRealKey, 311);							// 시가총액
+			GetCommRealDataEx(pData->전일동시간거래량비율, _countof(pData->전일동시간거래량비율), _sRealKey, 851);	// 전일동시간거래량비율
+
 			if (pPipe) { pPipe->Send(&packet); }
-			if (pNet->IsConnect())
-			{
-				pNet->Send(_PKT_NET_RECEIVE_TRANSACTION_KIWOOM_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION));
-			}
+			if (pNet) { pNet->Send(_네트워크패킷_키움_주식체결_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION)); }
 		}
-		/*
+		
 		else if (!strcmp(_sRealType, "주식호가잔량"))
 		{
-			패킷헤더포->nRealType = _키움_주식호가잔량_;
-
-			키움_주식호가잔량포 호가잔량포 = (키움_주식호가잔량포)&packet.bytBuffer[0];
-			::strcpy_s(호가잔량포->호가시간, sizeof(호가잔량포->호가시간), GetCommRealData(_sRealData, 21).GetBuffer());
-			호가잔량포->매도호가총잔량 = (UINT64)atoi(GetCommRealData(_sRealKey, 121).GetBuffer());
-			호가잔량포->매수호가총잔량 = (UINT64)atoi(GetCommRealData(_sRealKey, 125).GetBuffer());
-
-			packet.nPacketSize = sizeof(키움_주식호가잔량);
+			// [139] 매도비율
+			// [121] 매수호가총잔량
+			// [125] 매도호가총잔량
+			PACKET_BASE packet =
+			{	// 메모리 할당과 복사를 한번만 하기 위해 여기에서 PACKET_BASE 를 할당한다.
+				sizeof(키움_주식호가잔량)
+				, _브릿지패킷_키움_주식호가잔량_
+				, { 0 }
+			};
+			키움_주식호가잔량포 pData = (키움_주식호가잔량포)&packet.bytBuffer[0];
+			pData->nRealType = _키움_주식호가잔량_;
+			::strcpy_s(pData->종목코드, sizeof(pData->종목코드), _sRealKey);								// 종목코드
+			
+			GetCommRealDataEx(pData->호가시간, _countof(pData->호가시간), _sRealKey, 21);					// 호가 상태를 업데이트만 할꺼라서 시간은 필요없긴함
+			GetCommRealDataEx(pData->매도호가총잔량, _countof(pData->매도호가총잔량), _sRealKey, 121);
+			GetCommRealDataEx(pData->매수호가총잔량, _countof(pData->매수호가총잔량), _sRealKey, 125);
+			GetCommRealDataEx(pData->매도비율, _countof(pData->매도비율), _sRealKey, 139);
+			
 			if (pPipe) { pPipe->Send(&packet); }
+			if (pNet) { pNet->Send(_네트워크패킷_키움_주식호가잔량_, (LPBYTE)packet.bytBuffer, sizeof(키움_주식호가잔량)); }
 		}
+		/*
 		else if (!strcmp(_sRealType, "주식시세"))
 		{
 			패킷헤더포->nRealType = _키움_주식시세_;
@@ -228,9 +246,17 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			패킷헤더포->nRealType = _키움_주식시간외호가_;
 			//DBGPRINT("OnReceiveRealData() %s / %s / %s", _sRealKey, _sRealType, _sRealData);
 		}
+		*/
 		else if (!strcmp(_sRealType, "장시작시간"))
 		{
-			패킷헤더포->nRealType = _키움_장시작시간_;
+			PACKET_BASE packet =
+			{	// 메모리 할당과 복사를 한번만 하기 위해 여기에서 PACKET_BASE 를 할당한다.
+				sizeof(키움_장시작시간)
+				, _브릿지패킷_키움_장시작시간_
+				, { 0 }
+			};
+			키움_장시작시간포 pData = (키움_장시작시간포)&packet.bytBuffer[0];
+			pData->nRealType = _키움_장시작시간_;
 
 			//	0 : 장시작전
 			//	2 : 장마감전 동시호가
@@ -245,17 +271,20 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			//	s : 선옵 장마감전 동시호가 시작
 			//	e : 선옵 장마감전 동시호가 종료
 
-			키움_장시작시간포 장시작시간포 = (키움_장시작시간포)&packet.bytBuffer[0];
 			// 구분, 장운영구분(0:장시작전, 2:장종료전 동시호가, 3:장시작, 4: 장종료 예상지수 종료, 8:장종료, 9:장마감)
-			::strcpy_s(장시작시간포->장운영구분, sizeof(장시작시간포->장운영구분), GetCommRealData(_sRealKey, 215).GetBuffer());
+			::strcpy_s(pData->장운영구분, sizeof(pData->장운영구분), GetCommRealData(_sRealKey, 215).GetBuffer());
 			// 남은시간, 장시작 예상잔여시간
-			::strcpy_s(장시작시간포->장시작예상잔여시간, sizeof(장시작시간포->장시작예상잔여시간), GetCommRealData(_sRealKey, 214).GetBuffer());
+			::strcpy_s(pData->장시작예상잔여시간, sizeof(pData->장시작예상잔여시간), GetCommRealData(_sRealKey, 214).GetBuffer());
 
 			packet.nPacketSize = sizeof(키움_장시작시간);
 			if (pPipe) { pPipe->Send(&packet); }
+			if (pNet)
+			{
+				pNet->Send(_브릿지패킷_키움_장시작시간_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION));
+			}
 			//DBGPRINT("장시작시간 도착 %s / %s", strType, strRemainTime);
 		}
-		
+		/*
 		else
 		{
 			DBGPRINT("[%s] %s >> %s"

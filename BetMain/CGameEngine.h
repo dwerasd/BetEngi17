@@ -42,6 +42,7 @@
 
 typedef std::unordered_map<std::string, std::string> UMAP_STRING_TO_STRING; 
 typedef std::unordered_map<std::string, C_OBJECT_MONSTER*> UMAP_MONSTERS;
+typedef std::unordered_map<std::string, LPORDERBOOK_KIWOOM> UMAP_KIWOOM_ORDERBOOKS;
 
 typedef std::unordered_map<std::string, 동적버퍼_캔들> 유맵_동적캔들;
 class C_GAME
@@ -70,6 +71,7 @@ public:
 	std::vector<std::string> 벡터_감시중인_종목코드;
 
 	UMAP_MONSTERS umObjectMonsters;
+	UMAP_KIWOOM_ORDERBOOKS umKiwoomOrderBooks;
 	void InitMonster(LPSTOCK_INFO_CREON _종목정보);
 	C_OBJECT_MONSTER* FindMonster(LPCSTR _종목코드);
 	void UpdateMonster(LPSTOCK_INFO_KIWOOM _종목정보);
@@ -79,14 +81,19 @@ public:
 	LPBYTE pTickBuffer{ nullptr }, pTickBufferPtr{ nullptr };	// 이건 저장용 틱버퍼인데, 여기에선 저장하지 않기로 한다.
 
 	LPTICK_DATA AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData);
+	
+
 	void PushTickData(LPKIWOOM_REALDATA_TRANSACTION _pData);
+	void PushOrderBookData(키움_주식호가잔량포 _pData);
 	// 저장된 틱을 파일에서 한개씩 넣는거다.
-	LPTICK_DATA AppendTick(LPTICK_DATA _pData);
-	void PushTickData(LPTICK_DATA _pData);
+	LPTICK_DATAEX AppendTick(LPTICK_DATAEX _pData);
+	void PushTickData(LPTICK_DATAEX _pData);
 
 	LPTICK_DATA AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData);
 
-	void HandlerTick(LPTICK_DATA _pData);
+	LPTICK_DATAEX AppendTickEx(LPTICK_DATAEX _pData);
+	LPTICK_DATAEX AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook);
+	void HandlerTick(LPTICK_DATAEX _pData);
 
 	long LoadSticks(LPARRAY_STICK_BASE _캔들포);
 	void PreReadySticks();

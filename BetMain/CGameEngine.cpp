@@ -151,7 +151,7 @@ LPTICK_DATA C_GAME::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 
 		pTickData->nSequence = nCountAccrueTick++;	// 더하고 증가, 순서는 0부터 기록한다.
 		// 코드는 복사, 7바이트 문자배열이라 제로 메모리는 굳이 안쓴다.
-		strncpy_s(pTickData->szCode, 배열크기(pTickData->szCode) * sizeof(char), _pData->szStockCode, 6);
+		strncpy_s(pTickData->szCode, 배열크기(pTickData->szCode) * sizeof(char), _pData->종목코드, 6);
 		pTickData->szCode[6] = 0;
 		// 이 함수가 호출된 시스템 시간을 얻어온다.
 		dk::DLOCAL_TIME currentTime;
@@ -160,12 +160,12 @@ LPTICK_DATA C_GAME::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 		// 아직 저장할게 아니니까 endian 변환은 하지 않는다.
 		//sprintf_s(szTime, "%08x", (::atoi(_szTime) * 1000) + cur_time.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
 		//pTickData->nTime = ::ntohl(::strtol(szTime, NULL, 16));
-		sprintf_s(szTime, "%d", (::atoi(_pData->szTime) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
+		sprintf_s(szTime, "%d", (::atoi(_pData->체결시간) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
 		pTickData->nTime = ::atoi(szTime);
 
 		// 매수 매도인지 여기서 판단 후에 종목에 넘겨주도록 하자.
-		if ('+' == _pData->szVolume[0]) { pTickData->nTransType = 1; }		// 매수 체결
-		else if ('-' == _pData->szVolume[0]) { pTickData->nTransType = 2; }	// 매도체결
+		if ('+' == _pData->체결량[0]) { pTickData->nTransType = 1; }		// 매수 체결
+		else if ('-' == _pData->체결량[0]) { pTickData->nTransType = 2; }	// 매도체결
 		else
 		{	
 			{
@@ -173,26 +173,100 @@ LPTICK_DATA C_GAME::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 			}
 		}
 		// 부호가 붙어 있으면 무시하고 숫자만 변환
-		pTickData->fPrice = (float)dk::atoi_s(_pData->szClose);
-		pTickData->nTransVolume = dk::atoi_s(_pData->szVolume);
-		pTickData->nAccrueVolume = dk::atoi_s(_pData->szAccrueVolume);
-		pTickData->최우선매도호가 = (float)dk::atoi_s(_pData->szPriceSell);
-		pTickData->최우선매수호가 = (float)dk::atoi_s(_pData->szPriceBuy);
+		pTickData->fPrice = (float)dk::atoi_s(_pData->체결가);
+		pTickData->nTransVolume = dk::atoi_s(_pData->체결량);
+		pTickData->nAccrueVolume = dk::atoi_s(_pData->누적거래량);
+		pTickData->최우선매도호가 = (float)dk::atoi_s(_pData->최우선매도호가);
+		pTickData->최우선매수호가 = (float)dk::atoi_s(_pData->최우선매수호가);
 		//디뷰("%d / %d", pTickData->nTransVolume, pTickData->nAccrueVolume);	// 왜 이걸 안쓰면 누락이 발생하는거지
 		pTickBufferPtr += sizeof(TICK_DATA);	// 채운만큼 포인터 이동
 	}
 	return(pTickData);
 }
 
-LPTICK_DATA C_GAME::AppendTick(LPTICK_DATA _pData)
-{
-	LPTICK_DATA pTick = (LPTICK_DATA)pTickBufferPtr;
-	::memset(pTick, 0, sizeof(TICK_DATA));
+LPTICK_DATAEX C_GAME::AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook)
+{	// 일단 틱 데이터를 연속된 메모리에 변환해서 쌓는다.
+	LPTICK_DATAEX pTickDataEx = nullptr;
+	if (pTickBuffer)
+	{
+		pTickDataEx = (LPTICK_DATAEX)pTickBufferPtr;
+		::memset(pTickDataEx, 0, sizeof(TICK_DATAEX));
 
-	::memcpy_s(pTick, sizeof(TICK_DATA), _pData, sizeof(TICK_DATA));
+		pTickDataEx->nSequence = nCountAccrueTick++;	// 더하고 증가, 순서는 0부터 기록한다.
+		// 코드는 복사, 7바이트 문자배열이라 제로 메모리는 굳이 안쓴다.
+		::strncpy_s(pTickDataEx->szCode, _countof(pTickDataEx->szCode) * sizeof(char), _pData->종목코드, 6);
+		pTickDataEx->szCode[6] = 0;
+		// 이 함수가 호출된 시스템 시간을 얻어온다.
+		dk::DLOCAL_TIME currentTime;
+		// 밀리초를 더한다. ( 시간 변환은 여기서 저장용으로 한번만 한다.
+		char szTime[(1 << 4)] = { 0 };
+		// 아직 저장할게 아니니까 endian 변환은 하지 않는다.
+		//sprintf_s(szTime, "%08x", (::atoi(_szTime) * 1000) + cur_time.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
+		//pTickDataEx->nTime = ::ntohl(::strtol(szTime, NULL, 16));
+		sprintf_s(szTime, "%d", (::atoi(_pData->체결시간) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
+		pTickDataEx->nTime = ::atoi(szTime);
+
+		// 매수 매도인지 여기서 판단 후에 종목에 넘겨주도록 하자.
+		if ('+' == _pData->체결량[0]) { pTickDataEx->nTransType = 1; }		// 매수 체결
+		else if ('-' == _pData->체결량[0]) { pTickDataEx->nTransType = 2; }	// 매도체결
+		else
+		{	/*
+			// 단일가 매매의 경우 전일 종가와 비교해 부호가 붙는다.
+			if ('+' == _szClose[0])
+			{
+				pTickDataEx->nTransType = 4;
+			}
+			else if ('-' == _szClose[0])
+			{
+				pTickDataEx->nTransType = 5;
+			}
+			else
+			*/
+			{
+				pTickDataEx->nTransType = 3;	// 전일종가와 동일할 경우
+			}
+		}
+		// 부호가 붙어 있으면 무시하고 숫자만 변환
+		pTickDataEx->fPrice = (float)dk::atoi_s(_pData->체결가);
+		pTickDataEx->nTransVolume = dk::atoi_s(_pData->체결량);
+		pTickDataEx->nAccrueVolume = dk::atoi_s(_pData->누적거래량);
+		pTickDataEx->최우선매도호가 = (float)dk::atoi_s(_pData->최우선매도호가);
+		pTickDataEx->최우선매수호가 = (float)dk::atoi_s(_pData->최우선매수호가);
+
+
+		pTickDataEx->시가 = dk::atoi_s(_pData->szOpen);
+		pTickDataEx->고가 = dk::atoi_s(_pData->szHigh);
+		pTickDataEx->저가 = dk::atoi_s(_pData->szLow);
+
+		pTickDataEx->누적거래대금 = dk::atoi_s(_pData->누적거래대금);
+		pTickDataEx->시가총액_억 = dk::atoi_s(_pData->시가총액);
+
+		pTickDataEx->등락율 = (float)dk::atoi_s(_pData->등락율);
+		pTickDataEx->전일거래량대비_비율 = (float)dk::atoi_s(_pData->전일거래량대비);
+		pTickDataEx->거래회전율 = (float)dk::atoi_s(_pData->거래회전율);
+		pTickDataEx->체결강도 = (float)dk::atoi_s(_pData->체결강도);
+		pTickDataEx->전일동시간거래량비율 = (float)dk::atoi_s(_pData->전일동시간거래량비율);
+		if (_pOrderBook)
+		{
+			pTickDataEx->매도호가총잔량 = _pOrderBook->매도호가총잔량;
+			pTickDataEx->매수호가총잔량 = _pOrderBook->매수호가총잔량;
+			pTickDataEx->매도비율 = _pOrderBook->매도비율;
+		}
+		//디뷰("%d / %d", pTickDataEx->nTransVolume, pTickDataEx->nAccrueVolume);	// 왜 이걸 안쓰면 누락이 발생하는거지
+		pTickBufferPtr += sizeof(TICK_DATAEX);	// 채운만큼 포인터 이동
+	}
+	return(pTickDataEx);
+}
+
+LPTICK_DATAEX C_GAME::AppendTickEx(LPTICK_DATAEX _pData)
+{
+	LPTICK_DATAEX pTick = (LPTICK_DATAEX)pTickBufferPtr;
+	::memset(pTick, 0, sizeof(TICK_DATAEX));
+
+	::memcpy_s(pTick, sizeof(TICK_DATAEX), _pData, sizeof(TICK_DATAEX));
 	pTick->nSequence = nCountAccrueTick++;
 
-	pTickBufferPtr += sizeof(TICK_DATA);	// 채운만큼 포인터 이동
+	pTickBufferPtr += sizeof(TICK_DATAEX);	// 채운만큼 포인터 이동
 
 	return(pTick);
 }
@@ -207,7 +281,7 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 
 		pTickData->nSequence = nCountAccrueTick++;	// 더하고 증가, 순서는 0부터 기록한다.
 		// 코드는 복사, 7바이트 문자배열이라 제로 메모리는 굳이 안쓴다.
-		::strncpy_s(pTickData->szCode, 배열크기(pTickData->szCode) * sizeof(char), _pData->szStockCode, 6);
+		::strncpy_s(pTickData->szCode, 배열크기(pTickData->szCode) * sizeof(char), _pData->종목코드, 6);
 		pTickData->szCode[6] = 0;
 		// 이 함수가 호출된 시스템 시간을 얻어온다.
 		dk::DLOCAL_TIME currentTime;
@@ -216,12 +290,12 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 		// 아직 저장할게 아니니까 endian 변환은 하지 않는다.
 		//sprintf_s(szTime, "%08x", (::atoi(_szTime) * 1000) + cur_time.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
 		//pTickData->nTime = ::ntohl(::strtol(szTime, NULL, 16));
-		::sprintf_s(szTime, "%d", (::atoi(_pData->szTime) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
+		::sprintf_s(szTime, "%d", (::atoi(_pData->체결시간) * 1000) + currentTime.wMilliseconds);		// 9000000, 11034600, 12593100, 15300000
 		pTickData->nTime = ::atoi(szTime);
 
 		// 매수 매도인지 여기서 판단 후에 종목에 넘겨주도록 하자.
-		if ('+' == _pData->szVolume[0]) { pTickData->nTransType = 1; }		// 매수 체결
-		else if ('-' == _pData->szVolume[0]) { pTickData->nTransType = 2; }	// 매도체결
+		if ('+' == _pData->체결량[0]) { pTickData->nTransType = 1; }		// 매수 체결
+		else if ('-' == _pData->체결량[0]) { pTickData->nTransType = 2; }	// 매도체결
 		else
 		{	/*
 			// 단일가 매매의 경우 전일 종가와 비교해 부호가 붙는다.
@@ -240,11 +314,11 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 			}
 		}
 		// 부호가 붙어 있으면 무시하고 숫자만 변환
-		pTickData->fPrice = (float)dk::atoi_s(_pData->szClose);
-		pTickData->nTransVolume = dk::atoi_s(_pData->szVolume);
-		pTickData->nAccrueVolume = dk::atoi_s(_pData->szAccrueVolume);
-		pTickData->최우선매도호가 = (float)dk::atoi_s(_pData->szPriceSell);
-		pTickData->최우선매수호가 = (float)dk::atoi_s(_pData->szPriceBuy);
+		pTickData->fPrice = (float)dk::atoi_s(_pData->체결가);
+		pTickData->nTransVolume = dk::atoi_s(_pData->체결량);
+		pTickData->nAccrueVolume = dk::atoi_s(_pData->누적거래량);
+		pTickData->최우선매도호가 = (float)dk::atoi_s(_pData->최우선매도호가);
+		pTickData->최우선매수호가 = (float)dk::atoi_s(_pData->최우선매수호가);
 		//디뷰("%d / %d", pTickData->nTransVolume, pTickData->nAccrueVolume);	// 왜 이걸 안쓰면 누락이 발생하는거지
 		pTickBufferPtr += sizeof(TICK_DATA);	// 채운만큼 포인터 이동
 	}
@@ -253,17 +327,30 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 
 void C_GAME::PushTickData(LPKIWOOM_REALDATA_TRANSACTION _pTick)
 {	// 여기로 키움 체결 데이터가 들어오는거다.
-	LPTICK_DATA pTick = AppendTick(_pTick);
+	LPTICK_DATAEX pTickDataEx = AppendTickEx(_pTick, umKiwoomOrderBooks[_pTick->종목코드]);
 	//HandlerTick(pTick);
 }
 
-void C_GAME::PushTickData(LPTICK_DATA _pData)
+void C_GAME::PushOrderBookData(키움_주식호가잔량포 _pData)
+{
+	LPORDERBOOK_KIWOOM pOrderBook = umKiwoomOrderBooks[_pData->종목코드];
+	if (!pOrderBook)
+	{
+		pOrderBook = umKiwoomOrderBooks[_pData->종목코드] = new ORDERBOOK_KIWOOM();
+	}
+	::strcpy_s(pOrderBook->종목코드, _pData->종목코드);
+	pOrderBook->매도호가총잔량 = ::atoi(_pData->매도호가총잔량);
+	pOrderBook->매수호가총잔량 = ::atoi(_pData->매수호가총잔량);
+	pOrderBook->매도비율 = (float)::atof(_pData->매도비율);
+}
+
+void C_GAME::PushTickData(LPTICK_DATAEX _pData)
 {	// 종목이 있든 없든 체결데이터 저장을 위해서 메모리에 적재한다.
-	LPTICK_DATA pTick = AppendTick(_pData);
+	LPTICK_DATAEX pTick = AppendTickEx(_pData);
 	HandlerTick(pTick);
 }
 
-void C_GAME::HandlerTick(LPTICK_DATA _pTick)
+void C_GAME::HandlerTick(LPTICK_DATAEX _pTick)
 {	///////////////////////////////////////////////////////////////////////////////
 	// 여기에서 틱 처리 하자.
 	///////////////////////////////////////////////////////////////////////////////

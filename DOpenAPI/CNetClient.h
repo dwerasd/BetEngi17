@@ -51,6 +51,7 @@ namespace net
 		long Connect(LPCSTR _pStrIP, WORD _nPort);
 		long HandleRecived(LPBYTE bytRecvBuf, int RecvSize);
 		void Send(WORD _nIndex, LPBYTE _pData = nullptr, WORD _nSize = 0);
+		void Send(LPPACKET_BASE _pMessage);
 		void Disconnect();
 
 		bool IsConnect() { return(INVALID_SOCKET != nSocket); }

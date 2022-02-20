@@ -141,7 +141,7 @@ public:
 	std::vector<LPSTICK_DATA> vStickDay;
 	ULONG nStickSizeDay{ 0 };						// 이전 봉을 채워놨다면 그 개수
 
-	void PushTick(LPTICK_DATA _pTick);
+	void PushTick(LPTICK_DATAEX _pTick);
 	void Update(
 		LPSTR _szTime			// 체결시간
 		, BYTE _bytType			// 체결 타입

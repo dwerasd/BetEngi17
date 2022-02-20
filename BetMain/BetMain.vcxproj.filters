@@ -46,9 +46,6 @@
     <Filter Include="증권사\키움">
       <UniqueIdentifier>{e13a3d10-3f2f-4c4e-b97a-b2474eb2d635}</UniqueIdentifier>
     </Filter>
-    <Filter Include="증권사\이베스트">
-      <UniqueIdentifier>{a9344467-7cb4-4414-b6f5-7e8e00a1cfd5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="증권사\브릿지베이스">
       <UniqueIdentifier>{a8aa548c-1829-4dd2-99a9-0020f7b04c56}</UniqueIdentifier>
     </Filter>

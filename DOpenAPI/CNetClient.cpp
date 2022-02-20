@@ -85,6 +85,15 @@ namespace net
 		}
 	}
 
+	void C_NET_CLIENT::Send(LPPACKET_BASE _pMessage)
+	{
+		if (INVALID_SOCKET != nSocket)
+		{
+			_pMessage->nPacketSize += sizeof(PACKET_HEADER);
+			::send(nSocket, (char*)_pMessage, netPacket.nPacketSize, 0);
+		}
+	}
+
 	long C_NET_CLIENT::HandleRecived(LPBYTE bytRecvBuf, int nReciveSize)
 	{
 		try
