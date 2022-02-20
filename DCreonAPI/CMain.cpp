@@ -2208,7 +2208,7 @@ void C_MAIN::CreateNewCandle500(bool _덮어쓰기)
 	}
 }
 
-void C_MAIN::PushData(LPPACKET_BASE _pData)
+void C_MAIN::PushReceivePacket(LPPACKET_BASE _pData)
 {	// 여기로 온전한 패킷 한개가 들어온다.
 	queueNetworkPackets.enqueue(_pData);
 }

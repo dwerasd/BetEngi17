@@ -21,7 +21,7 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 	}
 	if (!키움OCX) { 키움OCX = new C_KH_OPEN_API(); }
 
-	pPipe = new pipe::C_PIPE_CLIENT(L"PipeClientKiwoom", L"PipeServerKiwoom");
+	pPipe = new pipe::C_PIPE_CLIENT(strPipeNameRecv.c_str(), strPipeNameSend.c_str());
 	if (!pPipe)
 	{
 		디뷰메시지("파이프 접속 실패");

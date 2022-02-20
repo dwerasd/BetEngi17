@@ -419,7 +419,7 @@ bool C_MAIN::OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 	return(false);
 }
 
-void C_MAIN::PushData(LPPACKET_BASE _pData)
+void C_MAIN::PushReceivePacket(LPPACKET_BASE _pData)
 {	// 여기로 온전한 패킷 한개가 들어온다.
 	queueNetworkPackets.enqueue(_pData);
 }

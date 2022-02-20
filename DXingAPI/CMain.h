@@ -83,7 +83,7 @@ public:
 
 	bool OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam);
 
-	void PushData(LPPACKET_BASE _pData);
+	void PushReceivePacket(LPPACKET_BASE _pData);
 
 	void 파이프전송(LPPACKET_BASE _pData);
 	void 파이프전송(WORD _pData);

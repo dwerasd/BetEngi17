@@ -45,6 +45,9 @@ public:
 	virtual BOOL InitInstance();
 
 	// 여기부터 추가하는거다.
+	std::string 기본경로, 설정파일;
+	std::string strPipeNameRecv, strPipeNameSend;
+
 	C_KH_OPEN_API* 키움OCX{ nullptr };			// 키움 필수
 
 	pipe::C_PIPE_CLIENT* pPipe{ nullptr };

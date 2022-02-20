@@ -15,11 +15,20 @@ namespace pipe
 	{
 		pMain = C_MAIN::GetInstance();
 	}
+	C_PIPE_CLIENT::C_PIPE_CLIENT(LPCSTR _pRecv, LPCSTR _pSend)
+		: bAccept(false)
+		, pEventRecv(new dk::C_EVENT())
+	{
+		pMain = C_MAIN::GetInstance();
+		wchar_t 임시버퍼[_MAX_PATH] = { 0 };
+		wstrRecv = dk::AnsiToUtf16_s(임시버퍼, _countof(임시버퍼), _pRecv);
 
+		::memset(임시버퍼, 0, _countof(임시버퍼));
+		wstrSend = dk::AnsiToUtf16_s(임시버퍼, _countof(임시버퍼), _pSend);
+	}
 	C_PIPE_CLIENT::~C_PIPE_CLIENT()
 	{
-		dk::C_THREAD::Terminate();
-		dk::C_PIPE::Destroy();
+		Destroy();
 	}
 
 	int C_PIPE_CLIENT::Recv(LPPACKET_BASE _pData)
@@ -72,8 +81,8 @@ namespace pipe
 				return -2;
 			}
 		}
-		////DBGPRINT("C_PIPE_CLIENT_SERVER::Send() ret");
-		return dwWritten;
+		//DBGPRINT("C_PIPE_CLIENT_SERVER::Send() ret");
+		return(dwWritten);
 	}
 
 	int C_PIPE_CLIENT::Send(WORD _dwHeader, LPVOID _pData, WORD _nSize)
@@ -117,16 +126,21 @@ namespace pipe
 			if (!bAccept)
 			{
 				if (!dk::C_PIPE::Connect(wstrRecv.c_str(), wstrSend.c_str()))
-				{
+				{	// 접속 실패시 프로그램을 종료하지 않고 접속 시도를 하게 바꿔야한다.
+					//DBGPRINT("파이프 접속 실패, 프로그램을 종료합니다: %x", ulThreadId);
+					//LPPACKET_BASE pNetPacket = new PACKET_BASE();		// 새로 할당받는다.
+					//::memset(pNetPacket, 0, sizeof(PACKET_BASE));
+					//pNetPacket->nPacketIndex = _PKT_PIPE_DESTROY_;
+					//theApp.PushReceivePacket(pNetPacket);				// 패킷을 직접 넣고
+					//Send(_브릿지패킷_키움_클라이언트_접속해제_);		// 접속 해제를 날린다.
 					dk::C_PIPE::Destroy();								// 파이프 종료
-					
 				}
 				else
 				{
 					DBGPRINT("파이프 접속 완료");
 					bAccept = true;
 				}
-				dk::Sleep(500);
+				dk::멈춰(500);
 			}
 			else
 			{
@@ -141,12 +155,12 @@ namespace pipe
 					::memset(pNetPacket, 0, sizeof(PACKET_BASE));
 
 					memcpy_s(pNetPacket, sizeof(PACKET_BASE), &NetPacketBuffer, nRecvSize);
-					pMain->PushData(pNetPacket);
+					pMain->PushReceivePacket(pNetPacket);
 				}
 				else
-				{
+				{	// 여기에 오면 파이프를 초기화하고 재접속 시도를 하게 된다.
 					DBGPRINT("nRecvSize: %d or pEventRecv->InValid()", nRecvSize);
-					Destroy();
+					dk::C_PIPE::Destroy();
 					bAccept = false;
 				}
 			}

@@ -14,7 +14,16 @@ namespace pipe
 	{
 
 	}
+	C_PIPE_CLIENT::C_PIPE_CLIENT(LPCSTR _pRecv, LPCSTR _pSend)
+		: bAccept(false)
+		, pEventRecv(new dk::C_EVENT())
+	{
+		wchar_t 임시버퍼[_MAX_PATH] = { 0 };
+		wstrRecv = dk::AnsiToUtf16_s(임시버퍼, _countof(임시버퍼), _pRecv);
 
+		::memset(임시버퍼, 0, _countof(임시버퍼));
+		wstrSend = dk::AnsiToUtf16_s(임시버퍼, _countof(임시버퍼), _pSend);
+	}
 	C_PIPE_CLIENT::~C_PIPE_CLIENT()
 	{
 		Destroy();

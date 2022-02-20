@@ -25,8 +25,29 @@ COpenAPI::COpenAPI()
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
 	// InitInstance에 모든 중요한 초기화 작업을 배치합니다.
+
+	char 임시버퍼[(1 << 10)] = { 0 };
+	dk::GetCurrentDirectoryA(임시버퍼);
+	기본경로 = 임시버퍼;
+
+	// 실행파일 경로를 구하고
+	::GetModuleFileNameA(::GetModuleHandleW(0), 임시버퍼, 배열크기(임시버퍼));
+	// '\\' 를 '/' 로 수정
+	for (size_t i = 0; i < ::strlen(임시버퍼); i++) { if ('\\' == 임시버퍼[i]) { 임시버퍼[i] = '/'; } }
+	// 확장자를 자르고
+	임시버퍼[::strlen(임시버퍼) - 3] = 0;
+	// ini 를 붙인다.
+	::strcat_s(임시버퍼, "ini");
+	설정파일 = 임시버퍼;
+
+	::memset(임시버퍼, 0, _countof(임시버퍼));
+	::GetPrivateProfileStringA("pipe", "recv", "", 임시버퍼, 배열크기(임시버퍼), 설정파일.c_str());
+	strPipeNameRecv = 임시버퍼;
+	::GetPrivateProfileStringA("pipe", "send", "", 임시버퍼, 배열크기(임시버퍼), 설정파일.c_str());
+	strPipeNameSend = 임시버퍼;
 	// 파이프 패킷 처리 스레드 생성
 	this->ThreadStart();							// 키움 필수
+
 }
 
 

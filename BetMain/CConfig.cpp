@@ -26,12 +26,12 @@ void C_CONFIG::초기화()
 	// 확장자를 자르고
 	임시버퍼[::strlen(임시버퍼) - 3] = 0;
 	// ini 를 붙인다.
-	strcat_s(임시버퍼, "ini");
+	::strcat_s(임시버퍼, "ini");
 	설정파일 = 임시버퍼;
 
-	sprintf_s(임시버퍼, "%sDCreonAPI.ini", 기본경로.c_str());
+	::sprintf_s(임시버퍼, "%sDCreonAPI.ini", 기본경로.c_str());
 	크레온설정파일 = 임시버퍼;
-	sprintf_s(임시버퍼, "%sDXingAPI.ini", 기본경로.c_str());
+	::sprintf_s(임시버퍼, "%sDXingAPI.ini", 기본경로.c_str());
 	이베스트설정파일 = 임시버퍼;
 
 	if (!dk::파일체크(설정파일.c_str()))

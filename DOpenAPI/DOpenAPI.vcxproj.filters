@@ -92,11 +92,11 @@
     <ClCompile Include="CKHOpenAPIHandler.cpp">
       <Filter>키움\소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CPipeHandler.cpp">
-      <Filter>기본\NewFilter1</Filter>
-    </ClCompile>
     <ClCompile Include="CNetClient.cpp">
       <Filter>통신\네트워크</Filter>
+    </ClCompile>
+    <ClCompile Include="CPipeHandler.cpp">
+      <Filter>기본\소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

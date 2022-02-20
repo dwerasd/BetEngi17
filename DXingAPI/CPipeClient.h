@@ -6,6 +6,8 @@
 #include <DarkCore/DPipe.h>
 #include <DarkCore/DEvent.h>
 #include <DarkCore/DThread.h>
+#include <DarkCore/DUtil.h>
+#include <DarkCore/DLocale.h>
 
 #include <Defines/NetworkDef.h>
 
@@ -18,7 +20,7 @@ namespace pipe
 		, public dk::C_THREAD
 	{
 	private:
-		bool bAccept;
+		bool bAccept{ false };
 		dk::C_EVENT* pEventRecv;
 
 		std::wstring wstrRecv;
@@ -28,6 +30,7 @@ namespace pipe
 
 	public:
 		C_PIPE_CLIENT(LPCWSTR _pRecv, LPCWSTR _pSend);
+		C_PIPE_CLIENT(LPCSTR _pRecv, LPCSTR _pSend);
 		~C_PIPE_CLIENT();
 
 		int Recv(LPPACKET_BASE _pData);
