@@ -2,6 +2,7 @@
 
 
 #include <DarkCore/DUtil.h>
+#include <DarkCore/DTimer.h>
 #include <DarkCore/DThread.h>
 #include <DarkCore/DSingleton.h>
 

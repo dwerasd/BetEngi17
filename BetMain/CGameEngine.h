@@ -45,8 +45,8 @@ typedef std::unordered_map<std::string, C_OBJECT_MONSTER*> UMAP_MONSTERS;
 typedef std::unordered_map<std::string, LPORDERBOOK_KIWOOM> UMAP_KIWOOM_ORDERBOOKS;
 
 typedef std::unordered_map<std::string, 동적버퍼_캔들> 유맵_동적캔들;
-class C_GAME
-	: public dk::C_SINGLETON<C_GAME>
+class C_ENGINE
+	: public dk::C_SINGLETON<C_ENGINE>
 	, public dk::C_THREAD
 {
 private:
@@ -61,8 +61,8 @@ private:
 	DWORD ThreadFunc(LPVOID _pParam);
 	
 public:
-	C_GAME();
-	~C_GAME();
+	C_ENGINE();
+	~C_ENGINE();
 
 	// 디비 호출은 느리니까 처음에 전부 가져와서 가지고 있는다.
 	std::vector<std::string> 벡터_모든_종목코드;

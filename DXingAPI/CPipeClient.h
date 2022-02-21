@@ -7,6 +7,7 @@
 #include <DarkCore/DEvent.h>
 #include <DarkCore/DThread.h>
 #include <DarkCore/DUtil.h>
+#include <DarkCore/DTimer.h>
 #include <DarkCore/DLocale.h>
 
 #include <Defines/NetworkDef.h>

@@ -1,16 +1,16 @@
 ﻿//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++에서 생성한 포함 파일입니다.
-// BetMain.rc에서 사용되고 있습니다.
+// BetRadar.rc에서 사용되고 있습니다.
 //
 #define IDC_MYICON                      2
-#define IDD_BETMAIN_DIALOG              102
+#define IDD_BETRADAR_DIALOG             102
 #define IDS_APP_TITLE                   103
 #define IDD_ABOUTBOX                    103
 #define IDM_ABOUT                       104
 #define IDM_EXIT                        105
-#define IDI_BETMAIN                     107
+#define IDI_BETRADAR                    107
 #define IDI_SMALL                       108
-#define IDC_BETMAIN                     109
+#define IDC_BETRADAR                    109
 #define IDR_MAINFRAME                   128
 #define IDD_MAIN                        129
 #define ID_BTN_HIDE                     1000

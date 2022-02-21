@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="기본">
-      <UniqueIdentifier>{c9c56037-0e43-4353-a568-cb84c5c3c38b}</UniqueIdentifier>
+      <UniqueIdentifier>{bdaea4cc-ea5b-47fa-9669-f45495fd0faa}</UniqueIdentifier>
     </Filter>
     <Filter Include="기본\헤더 파일">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -16,20 +16,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="서버">
-      <UniqueIdentifier>{45f65438-b12e-4e3a-9999-00a6e06e722c}</UniqueIdentifier>
+    <Filter Include="통신">
+      <UniqueIdentifier>{b5421a94-b5b6-4ea2-a507-62fea5ea2d76}</UniqueIdentifier>
     </Filter>
-    <Filter Include="서버\TCP서버">
-      <UniqueIdentifier>{25a2dcaf-9e9b-462a-b184-b75233dd9239}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="서버\PIPE서버">
-      <UniqueIdentifier>{f1b9664e-5757-48d7-a711-fa20f2417ccf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="서버\PIPE서버\브릿지">
-      <UniqueIdentifier>{dafbcac0-2fb3-4ba6-96da-1d04f3bae00c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="엔진">
-      <UniqueIdentifier>{a06b4808-6702-4d49-8145-6ea714c5828f}</UniqueIdentifier>
+    <Filter Include="통신\TCP클라">
+      <UniqueIdentifier>{35e53823-51e5-44b1-b29e-9415c2b5808c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,18 +36,12 @@
     <ClInclude Include="CMain.h">
       <Filter>기본\헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CNetServer.h">
-      <Filter>서버\TCP서버</Filter>
-    </ClInclude>
-    <ClInclude Include="CPipeServer.h">
-      <Filter>서버\PIPE서버</Filter>
-    </ClInclude>
-    <ClInclude Include="CBridgeBase.h">
-      <Filter>서버\PIPE서버\브릿지</Filter>
+    <ClInclude Include="CNetClient.h">
+      <Filter>통신\TCP클라</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="BetServ.rc">
+    <ResourceCompile Include="BetRadar.rc">
       <Filter>기본\리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -64,7 +49,7 @@
     <Image Include="small.ico">
       <Filter>기본\리소스 파일</Filter>
     </Image>
-    <Image Include="BetServ.ico">
+    <Image Include="BetRadar.ico">
       <Filter>기본\리소스 파일</Filter>
     </Image>
   </ItemGroup>
@@ -75,23 +60,8 @@
     <ClCompile Include="CMain.cpp">
       <Filter>기본\소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CNetServer.cpp">
-      <Filter>서버\TCP서버</Filter>
-    </ClCompile>
-    <ClCompile Include="CPipeServer.cpp">
-      <Filter>서버\PIPE서버</Filter>
-    </ClCompile>
-    <ClCompile Include="CBridgeBase.cpp">
-      <Filter>서버\PIPE서버\브릿지</Filter>
-    </ClCompile>
-    <ClCompile Include="CMainKiwoom.cpp">
-      <Filter>기본\소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CMainEBest.cpp">
-      <Filter>기본\소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CMainCreon.cpp">
-      <Filter>기본\소스 파일</Filter>
+    <ClCompile Include="CNetClient.cpp">
+      <Filter>통신\TCP클라</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

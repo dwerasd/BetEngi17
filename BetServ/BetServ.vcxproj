@@ -170,7 +170,6 @@
   <ItemGroup>
     <ClInclude Include="CBridgeBase.h" />
     <ClInclude Include="CMain.h" />
-    <ClInclude Include="CMemDB.h" />
     <ClInclude Include="CNetServer.h" />
     <ClInclude Include="CPipeServer.h" />
     <ClInclude Include="framework.h" />
@@ -180,7 +179,18 @@
   <ItemGroup>
     <ClCompile Include="CBridgeBase.cpp" />
     <ClCompile Include="CMain.cpp" />
-    <ClCompile Include="CMemDB.cpp" />
+    <ClCompile Include="CMainCreon.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CMainEBest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="CMainKiwoom.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="CNetServer.cpp" />
     <ClCompile Include="CPipeServer.cpp" />
     <ClCompile Include="WinMain.cpp" />

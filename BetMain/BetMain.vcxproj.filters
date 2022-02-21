@@ -34,9 +34,6 @@
     <Filter Include="데이터베이스">
       <UniqueIdentifier>{b22686ce-2cdf-4961-8284-0b33fd7121e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="기본\오더처리">
-      <UniqueIdentifier>{e3a6ec72-956b-4cd6-ba50-09f587ca4d46}</UniqueIdentifier>
-    </Filter>
     <Filter Include="게임\엔진">
       <UniqueIdentifier>{5e7f0947-5126-44a6-8e90-78c5c230ddde}</UniqueIdentifier>
     </Filter>
@@ -95,9 +92,6 @@
     </ClInclude>
     <ClInclude Include="CDatabase.h">
       <Filter>데이터베이스</Filter>
-    </ClInclude>
-    <ClInclude Include="COrder.h">
-      <Filter>기본\오더처리</Filter>
     </ClInclude>
     <ClInclude Include="GameDef.h">
       <Filter>게임</Filter>
@@ -159,9 +153,6 @@
     <ClCompile Include="CDatabase.cpp">
       <Filter>데이터베이스</Filter>
     </ClCompile>
-    <ClCompile Include="COrder.cpp">
-      <Filter>기본\오더처리</Filter>
-    </ClCompile>
     <ClCompile Include="GameStruct.cpp">
       <Filter>게임</Filter>
     </ClCompile>
@@ -172,9 +163,6 @@
       <Filter>증권사\키움</Filter>
     </ClCompile>
     <ClCompile Include="CMainDropFile.cpp">
-      <Filter>기본\소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CMainWin32Object.cpp">
       <Filter>기본\소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CMainImGuiPopup.cpp">

@@ -8,7 +8,7 @@
 
 static C_MAIN* pMain = nullptr;
 static C_ENGINE* pEngine = nullptr;
-static C_BRIDGE_KIWOOM* pBridgeKiwoom = nullptr;
+static C_BRIDGE_BASE* pBridgeKiwoom = nullptr;
 LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 {
 	try

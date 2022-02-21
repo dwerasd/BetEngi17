@@ -25,26 +25,16 @@
 
 #include "resource.h"
 
-//#define _USE_WIN32_GUI_
-#if defined(_USE_WIN32_GUI_)
-#include <DarkCore/DWin32Obj.h>
-#endif
-
 #include <DX9Wrapp/CImGui.h>
 #if defined(_USE_LIB_IMGUI_)
 #pragma comment(lib, "DX9Wrapp")
 #endif
 
 #include "CConfig.h"
-#if defined(_USE_NET_ENGINE_)
-#include "CNetEngine.h"
-#endif
-
 #include "CBridgeKiwoom.h"
 
 #include "GameDef.h"
 #include "CGameEngine.h"
-#include "COrder.h"
 
 enum
 {
@@ -68,21 +58,16 @@ constexpr WORD _기본타이머_ = 1;
 
 class C_MAIN
 	: public dk::C_SINGLETON<C_MAIN>	// 단 한개만 생성되고 GetInstance 활성
-#if defined(_USE_WIN32_GUI_)
-	, public dk::C_WIN32_WINDOW
-#endif
 	//, public dk::C_THREAD
 #if defined(_USE_LIB_IMGUI_)
 	, public C_IMGUI
 #endif
 {
 private:
-#if !defined(_USE_WIN32_GUI_)
-	LPCWSTR pClassName{ nullptr };
-	HWND hWnd{ 0 };
-#endif
 	bool bWindowMode{ true }, bShowWindow{ false }, bExitProcess{ false }, bHighPerformance{ false }, bChangeSizeWindow{ false };
 	HINSTANCE hInst{ 0 };
+	HWND hWnd{ 0 };
+	LPCWSTR pClassName{ nullptr };
 
 	dk::C_LOG_EX* pLog{ nullptr };
 	dk::C_TRAY_ICON* pTrayIcon{ nullptr };
@@ -94,24 +79,9 @@ private:
 
 	C_CONFIG* 설정포{ nullptr };
 
-	C_GAME* pGame{ nullptr };
+	C_ENGINE* pEngine{ nullptr };
 
 	size_t DropFile(LPCSTR _pPath);
-#if defined(_USE_NET_ENGINE_)
-	C_NET_ENGINE* pNetEngi{ nullptr };
-#endif
-#if defined(_USE_WIN32_GUI_)
-	dk::C_WIN32_LABEL* pLabel1{ nullptr };
-	dk::C_WIN32_BUTTON* pButton1{ nullptr };
-
-	std::vector<HFONT> vFonts;
-	HWND hListView_NoticeBoard;
-	HWND hListView_Conditions;
-	HWND hListView_CaptureCondition;
-	HWND hListboxStockCode{ nullptr };
-
-	void CreateWin32Gui();
-#endif
 
 #if defined(_USE_LIB_IMGUI_)
 	bool bDraw[_팝업창갯수_] = { false };
@@ -137,10 +107,6 @@ private:
 	void 스케줄생성(LPCSTR _파일명);
 	void timer200();
 
-	moodycamel::ConcurrentQueue<메인오더포> 오더큐;
-	//moodycamel::BlockingConcurrentQueue<LPPACKET_BASE> 증권사패킷큐;
-	//DWORD ThreadFunc(LPVOID _pParam);
-
 public:
 	C_MAIN(HINSTANCE _hInst);
 	~C_MAIN();
@@ -156,8 +122,6 @@ public:
 	C_BRIDGE_BASE* pBridgeCreon{ nullptr };
 	C_BRIDGE_KIWOOM* pBridgeKiwoom{ nullptr };
 	C_BRIDGE_BASE* pBridgeEBest{ nullptr };
-
-	void PushOrder(메인오더포 _오더);
 
 	bool OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam);
 };

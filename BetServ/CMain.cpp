@@ -4,6 +4,10 @@
 
 
 static C_MAIN* pMain = nullptr;
+LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData);
+LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData);
+LPVOID __stdcall BridgeCallbackEBest(ULONG_PTR _dwMessage, LPVOID _pData);
+
 LRESULT CALLBACK WndProc(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam)
 {
 	static C_MAIN* pWindow = nullptr;
@@ -120,7 +124,7 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 					{	// 파일이면
 						디뷰("파일이네: %s", szDtopPath);
 						//DropFile(szDtopPath);
-						//pGame->ReadFile(szDtopPath);
+						//pEngine->ReadFile(szDtopPath);
 					}
 					else if (2 == nResult)
 					{	// 폴더라면 해당 폴더안의 파일들을 얻어온다.
@@ -139,7 +143,7 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 							디뷰("파일이네: %s", path.c_str());
 							//nCountAccrue += DropFile(path.c_str());
 
-							//pGame->ReadFile(path.c_str());
+							//pEngine->ReadFile(path.c_str());
 							//디뷰("파일 처리에 걸린 시간: %0.6f", 퍼포먼스타이머[1].경과된시간());
 						}
 					}
@@ -164,7 +168,7 @@ C_MAIN::C_MAIN(HINSTANCE _hInst)
 
 C_MAIN::~C_MAIN()
 {
-	DSAFE_DELETE(pMemDB);
+	
 }
 
 static wchar_t wszWindowName[(1 << 7)] = { 0 };
@@ -197,9 +201,6 @@ bool C_MAIN::Init(LPCWSTR _wszClassName, LPCWSTR _wszWindowName, bool _bWindowMo
 		메인윈도우크기.cy = ::GetPrivateProfileIntA("location", "h", 800, 설정파일.c_str());
 
 		// 콜백 세팅 떄문에 여기서 생성하도록 한다.
-		DSAFE_DELETE(pMemDB);
-		pMemDB = new C_MEMDB();
-
 		::tagWNDCLASSEXW wcex = { sizeof(::tagWNDCLASSEXW), 0 };
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = WndProc;
@@ -319,7 +320,6 @@ void C_MAIN::Destroy() noexcept
 	}
 	::DestroyWindow(hWnd);
 	::UnregisterClassW(pClassName, hInst);
-	DSAFE_DELETE(pMemDB);
 	bExitProcess = true;
 	DSAFE_DELETE(pTrayIcon);
 }

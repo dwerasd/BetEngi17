@@ -180,7 +180,7 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			};
 			LPKIWOOM_REALDATA_TRANSACTION pData = (LPKIWOOM_REALDATA_TRANSACTION)&packet.bytBuffer[0];
 			pData->nRealType = _키움_주식체결_;
-			::strcpy_s(pData->종목코드, sizeof(pData->종목코드), _sRealKey);										// 종목코드
+			::strcpy_s(pData->종목코드, _countof(pData->종목코드), _sRealKey);										// 종목코드
 
 			GetCommRealDataEx(pData->체결가, _countof(pData->체결가), _sRealKey, 10);								// 체결가
 			GetCommRealDataEx(pData->등락율, _countof(pData->등락율), _sRealKey, 12);								// 등락율
@@ -218,7 +218,7 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			};
 			키움_주식호가잔량포 pData = (키움_주식호가잔량포)&packet.bytBuffer[0];
 			pData->nRealType = _키움_주식호가잔량_;
-			::strcpy_s(pData->종목코드, sizeof(pData->종목코드), _sRealKey);								// 종목코드
+			::strcpy_s(pData->종목코드, _countof(pData->종목코드), _sRealKey);								// 종목코드
 			
 			GetCommRealDataEx(pData->호가시간, _countof(pData->호가시간), _sRealKey, 21);					// 호가 상태를 업데이트만 할꺼라서 시간은 필요없긴함
 			GetCommRealDataEx(pData->매도호가총잔량, _countof(pData->매도호가총잔량), _sRealKey, 121);

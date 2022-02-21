@@ -3,17 +3,11 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// 브릿지 패킷은 모두 여기에서 처리한다.
-
-
 static C_MAIN* pMain = nullptr;
 LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData);
 LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData);
 LPVOID __stdcall BridgeCallbackEBest(ULONG_PTR _dwMessage, LPVOID _pData);
 
-///////////////////////////////////////////////////////////////////////////////
-#if !defined(_USE_WIN32_GUI_)
 LRESULT CALLBACK WndProc(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam)
 {
 	static C_MAIN* pWindow = nullptr;
@@ -42,8 +36,8 @@ LRESULT CALLBACK WndProc(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lPa
 	}
 	return DefWindowProcW(_hWnd, _nMessage, _wParam, _lParam);
 }
-#endif
-C_GAME* g_pGame = nullptr;
+
+C_ENGINE* g_pGame = nullptr;
 static _TCHAR wszWindowName[(1 << 7)] = { 0 };
 C_MAIN::C_MAIN(HINSTANCE _hInst)
 	: hInst(_hInst)
@@ -56,9 +50,9 @@ C_MAIN::C_MAIN(HINSTANCE _hInst)
 	{
 		pLog = new dk::C_LOG_EX("DBetMain");
 	}
-	디뷰("sizeof(C_GAME): %d", 크기(C_GAME));
+	디뷰("sizeof(C_ENGINE): %d", 크기(C_ENGINE));
 
-	//디뷰("sizeof(C_GAME): %d", 크기(C_GAME));
+	//디뷰("sizeof(C_ENGINE): %d", 크기(C_ENGINE));
 	//디뷰("sizeof(_데이터_배열_확장<762>): %d", 크기(_데이터_배열_확장<762>));
 	//디뷰("sizeof(종목_데이터_리얼): %d", 크기(종목_데이터_리얼));
 }
@@ -68,7 +62,7 @@ C_MAIN::~C_MAIN()
 	DSAFE_DELETE(pBridgeCreon);
 	DSAFE_DELETE(pBridgeKiwoom);
 	DSAFE_DELETE(pBridgeEBest);
-	DSAFE_DELETE(pGame);
+	DSAFE_DELETE(pEngine);
 }
 
 bool C_MAIN::Init(LPCWSTR _wszClassName, LPCWSTR _wszWindowName, bool _bWindowMode)
@@ -99,19 +93,12 @@ bool C_MAIN::Init(LPCWSTR _wszClassName, LPCWSTR _wszWindowName, bool _bWindowMo
 #endif
 		::tagWNDCLASSEXW wcex = { sizeof(::tagWNDCLASSEXW), 0 };
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
-#if defined(_USE_WIN32_GUI_)
-		wcex.lpfnWndProc = C_WIN32_WINDOW::WndProc;
-#else
 		wcex.lpfnWndProc = WndProc;
-#endif
 		wcex.hInstance = hInst;
 		wcex.hIcon = ::LoadIcon(hInst, MAKEINTRESOURCE(IDI_BETMAIN));
 		wcex.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
 		//wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wcex.hbrBackground = (HBRUSH)::GetStockObject(GRAY_BRUSH);
-#if defined(_USE_WIN32_GUI_)
-		wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_BETMAIN);
-#endif
 		wcex.lpszClassName = _wszClassName;
 		wcex.hIconSm = ::LoadIconW(hInst, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -139,9 +126,6 @@ bool C_MAIN::Create()
 		::AdjustWindowRect(&rcTemp, dwWindowStyle, FALSE);
 		hWnd = ::CreateWindowExW(
 			WS_EX_ACCEPTFILES
-#if defined(_USE_WIN32_GUI_)
-			| WS_EX_CLIENTEDGE
-#endif
 			, pClassName
 			, wszWindowName
 			, dwWindowStyle
@@ -155,32 +139,17 @@ bool C_MAIN::Create()
 			, this
 		);
 		if (!hWnd) { break; }
-#if defined(_USE_WIN32_GUI_)
-		dk::AddWin32Object(hWnd, this);
-#endif
 		// 트레이 아이콘 만들고
 		pTrayIcon = new dk::C_TRAY_ICON(hWnd, WM_TRAYICON, wszWindowName, ::LoadIcon(hInst, (LPCWSTR)IDI_BETMAIN), IDI_BETMAIN);
-#if defined(_USE_NET_ENGINE_)
-		if (!pNetEngi)
-		{
-			pNetEngi = new C_NET_ENGINE();
-			pNetEngi->네트워크_서버_실행();
-		}
 
-		// 파이프 서버는 클라이언트를 실행하기 직전에 자동으로 실행된다.
-		//pNetEngi->파이프_서버_실행(_크레온_);
-		//pNetEngi->파이프_서버_실행(_키움_);
-		//pNetEngi->파이프_서버_실행(_이베스트_);
-		//pNetEngi->파이프_서버_실행(_한국투자_);
-#endif
 		bShowWindow = true;
 		::ShowWindow(hWnd, SW_SHOWNORMAL);
 		::UpdateWindow(hWnd);
 
-		if (!pGame)
+		if (!pEngine)
 		{
-			pGame = new C_GAME();
-			pGame->초기화();
+			pEngine = new C_ENGINE();
+			pEngine->초기화();
 		}
 		// 콜백 세팅 떄문에 여기서 생성하도록 한다.
 		if (!pBridgeCreon)
@@ -198,9 +167,6 @@ bool C_MAIN::Create()
 			pBridgeEBest = new C_BRIDGE_BASE(BridgeCallbackEBest, L"PipeServerEBest", L"PipeClientEBest");
 			pBridgeEBest->Init("DXingAPI.exe");
 		}
-#if defined(_USE_WIN32_GUI_)
-		CreateWin32Gui();
-#endif
 #if defined(_USE_LIB_IMGUI_)
 		디뷰("C_MAIN::Create() - 임구이 초기화 시작");
 		C_IMGUI::SetWindowSize(설정포->메인윈도우크기.cx, 설정포->메인윈도우크기.cy);
@@ -214,7 +180,7 @@ bool C_MAIN::Create()
 		//		dk::멈춰(1);
 		//	} while (!파이프서버[_크레온_]->IsOnThread() && !파이프받는스레드);
 		//	// 크레온 중계기를 파이프 모드로 실행한다.
-		//	::WritePrivateProfileStringA("base", "server", "0", pGame->크레온설정파일.c_str());
+		//	::WritePrivateProfileStringA("base", "server", "0", pEngine->크레온설정파일.c_str());
 		//	dk::LPPROCESS_INFOMATION_EX 프로세스 = pProcessInfo["DCreonAPI"];
 		//	bool 성공여부 = dk::파일실행(프로세스->파일이름, 프로세스->파라미터, true, (LPPROCESS_INFORMATION)프로세스);
 		//	if (!성공여부) { 디뷰("C_MAIN::Create() - 크레온 중계기 실행에 실패함"); }
@@ -243,10 +209,6 @@ bool C_MAIN::Create()
 	return(bResult);
 }
 
-void C_MAIN::PushOrder(메인오더포 _오더)
-{
-	오더큐.enqueue(_오더);
-}
 #if defined(_USE_LIB_IMGUI_)
 long C_MAIN::Update_ImGui()
 {
@@ -281,21 +243,7 @@ long C_MAIN::Calculate()
 	do
 	{
 		if (bExitProcess) { nResult = 1; break; }
-		/*
-		// 이걸 쓰면 쓰면 GetLocalTime 을 쓰면 비교 1회 후 분기, 초가 바뀌고 밀리초 000~001 이면 들어온다.
-		메인오더포 오더포 = nullptr;
-		if (오더큐.try_dequeue(오더포))
-		{
-			switch (오더포->오더)
-			{
-			case _오더_실행_업데이트_크레온_:
-				break;
-			default:
-				break;
-			}
-			DSAFE_DELETE(오더포);
-		}
-		*/
+		
 		ULONG_PTR nTickCount = dk::GetTickCount();
 		if (nTickCount - nSecondTimer >= 1000)
 		{
@@ -409,19 +357,12 @@ void C_MAIN::Destroy() noexcept
 	C_IMGUI::Destroy_ImGui();
 #endif
 	::UnregisterClass(pClassName, hInst);
-	DSAFE_DELETE(pGame);
+	DSAFE_DELETE(pEngine);
 
 	DSAFE_DELETE(pBridgeCreon);
 	DSAFE_DELETE(pBridgeKiwoom);
 	DSAFE_DELETE(pBridgeEBest);
 
-#if defined(_USE_NET_ENGINE_)
-	//if (pNetEngi)
-	//{
-	//	pNetEngi->Destroy();
-	DSAFE_DELETE(pNetEngi);
-	//}
-#endif
 	if (설정포)
 	{
 		설정포->소멸();
@@ -549,7 +490,7 @@ void C_MAIN::timer200()
 									if (!프로세스아이디)
 									{	// 업데이터가 실행중인 상태도 아니다.
 										디뷰("C_MAIN::timer200() - 크레온 업데이터를 실행한다");
-										::WritePrivateProfileStringA("base", "server", "2", pGame->크레온설정파일.c_str());
+										::WritePrivateProfileStringA("base", "server", "2", pEngine->크레온설정파일.c_str());
 										dk::LPPROCESS_INFOMATION_EX 프로세스 = pProcessInfo["DCreonAPI"];
 										bool 성공여부 = dk::파일실행(프로세스->파일이름, 프로세스->파라미터, true, (LPPROCESS_INFORMATION)프로세스);
 										if (!성공여부) { 디뷰("C_MAIN::timer200() - 크레온 업데이터 실행에 실패함"); }
@@ -619,35 +560,12 @@ bool C_MAIN::OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 		((LPMINMAXINFO)_lParam)->ptMaxTrackSize.x = ::GetSystemMetrics(SM_CXMAXTRACK);	// 최대 크기 Width
 		((LPMINMAXINFO)_lParam)->ptMaxTrackSize.y = ::GetSystemMetrics(SM_CYMAXTRACK);	// 최대 크기 Height
 		return(true);
-#if defined(_USE_WIN32_GUI_)
-	case WM_NOTIFY:
-		do
-		{
-			LPNMHDR pHdr = (LPNMHDR)_lParam;
-
-			switch (pHdr->code)
-			{
-		} while (false);
-		break;
-#endif
 	case WM_COMMAND:
 		switch (LOWORD(_wParam))
 		{
-#if defined(_USE_WIN32_GUI_)
-		case IDM_EXIT:
-#endif
 		case WM_TRAY_CLOSE:
 			bExitProcess = true;
 			break;
-#if defined(_USE_WIN32_GUI_)
-		default:
-			dk::C_WIN32_OBJECT* pObject = dk::GetWin32Object((HWND)_lParam);
-			if (pObject)
-			{
-				if (pObject->pCommandHandler) { pObject->pCommandHandler(HIWORD(_wParam), 0); }
-			}
-			break;;
-#endif
 		}
 		return(true);
 	case WM_TIMER:
@@ -693,7 +611,7 @@ bool C_MAIN::OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 					{	// 파일이면
 						디뷰("파일이네: %s", szDtopPath);
 						DropFile(szDtopPath);
-						//pGame->ReadFile(szDtopPath);
+						//pEngine->ReadFile(szDtopPath);
 					}
 					else if (2 == nResult)
 					{	// 폴더라면 해당 폴더안의 파일들을 얻어온다.
@@ -713,7 +631,7 @@ bool C_MAIN::OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 							디뷰("파일이네: %s", path.c_str());
 							nCountAccrue += DropFile(path.c_str());
 							
-							//pGame->ReadFile(path.c_str());
+							//pEngine->ReadFile(path.c_str());
 							//디뷰("파일 처리에 걸린 시간: %0.6f", 퍼포먼스타이머[1].경과된시간());
 						}
 						디뷰("WM_DROPFILES() - 총 %d개 폴더처리에 걸린 시간: %0.6f", nCountAccrue, 퍼포먼스타이머[0].경과된시간());

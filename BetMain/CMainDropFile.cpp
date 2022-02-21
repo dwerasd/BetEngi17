@@ -20,7 +20,7 @@ public:
 DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 {
 	DWORD dwResult = 0;
-	C_GAME* pGame = (C_GAME::GetInstance());
+	C_ENGINE* pEngine = (C_ENGINE::GetInstance());
 	디뷰("C_FILE_HANDLER::ThreadFunc(start)");
 	
 	do
@@ -100,7 +100,7 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 							nErrorCount++ ;
 						}
 						*/
-						pGame->PushTickData(&data);
+						pEngine->PushTickData(&data);
 						dwResult++;
 					} while (true);
 					//DBGPRINT("총 체결 건수: %d", dwResult);
@@ -119,7 +119,7 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 						dk::ntohl(pTick->nTime);
 
 
-						pGame->PushTickData(pTick);
+						pEngine->PushTickData(pTick);
 						pBuffer += sizeof(TICK_DATAEX);
 					}
 					디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());
@@ -260,7 +260,7 @@ size_t C_MAIN::DropFile(LPCSTR _pPath)
 				nErrorCount++ ;
 			}
 			*/
-			pGame->PushTickData(&data);
+			pEngine->PushTickData(&data);
 			nResult++;
 		} while (true);
 		DBGPRINT("총 체결 건수: %d", nResult);
@@ -277,7 +277,7 @@ size_t C_MAIN::DropFile(LPCSTR _pPath)
 		{
 			LPTICK_DATA pTick = (LPTICK_DATA)pBuffer;
 			dk::ntohl(pTick->nTime);
-			pGame->PushTickData(pTick);
+			pEngine->PushTickData(pTick);
 			pBuffer += sizeof(TICK_DATA);
 		}
 	}

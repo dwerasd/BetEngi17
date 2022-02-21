@@ -96,7 +96,7 @@ LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData)
 								&& 0 < pStockInfo->전일종가				// 전일종가 없는건 아예 없는 STOCK_INFO.
 								)	// 거래할 종목만 메모리에 적재한다.
 							{	// 현물만
-								
+
 								//if (!strcmp(&pStockInfo->종목명[::strlen(pStockInfo->종목명) - 2], "우"))
 								//{
 								//	//디뷰("우 거름 체크해보자: [%s] %s", pStockInfo->종목코드, pStockInfo->종목명);
@@ -127,7 +127,7 @@ LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData)
 								//if (10 == pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
 								//if (12 == pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
 								//if (14 < pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
-								
+
 								if (17 == pStockInfo->nKseSectionKind) { break; }			// [9]: ELW, [10]: ETF, [11]: 수익증권, [12]: 해외ETF, [13]: 외국주권, [14]: 선물, [15]: 옵션, [16]: KONEX, [17]: ETN
 								//종목추가(pStockInfo);
 								pEngine->InitMonster(pStockInfo);

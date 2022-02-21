@@ -37,12 +37,12 @@ long C_MAIN::Draw_MainMenu(bool& _bVisible)
 						
 						if (중계기_통신상태[_이베스트_])
 						{
-							종목정보_확장포 종목포 = pGame->종목찾기("005930");
+							종목정보_확장포 종목포 = pEngine->종목찾기("005930");
 							if (!종목포)
 							{
-								pGame->종목추가_크레온(1, "005930", "A005930", "KR7005930003", "삼성전자", 77000);
-								pGame->크레온종목받음 = true;
-								종목포 = pGame->종목찾기("005930");
+								pEngine->종목추가_크레온(1, "005930", "A005930", "KR7005930003", "삼성전자", 77000);
+								pEngine->크레온종목받음 = true;
+								종목포 = pEngine->종목찾기("005930");
 							}
 							PACKET_BASE 패킷 = { 0 };
 							패킷.nPacketIndex = _PKT_PIPE_REALTIME_DATA_XINGAPI_;
@@ -641,9 +641,9 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 			ImGui::PushItemWidth(100.0f);
 			ImGui::Text(GetUtf8("종목코드"));
 			ImGui::SameLine();
-			if (ImGui::InputText(GetUtf8("##종목코드"), pGame->선택된종목코드, 배열크기(pGame->선택된종목코드), 종목코드박스플래그))
+			if (ImGui::InputText(GetUtf8("##종목코드"), pEngine->선택된종목코드, 배열크기(pEngine->선택된종목코드), 종목코드박스플래그))
 			{
-				디뷰("종목코드: %s", pGame->선택된종목코드);
+				디뷰("종목코드: %s", pEngine->선택된종목코드);
 			}
 			ImGui::PopItemWidth();
 			const ImVec2 버튼크기 = { ImGui::GetWindowWidth() * 0.5f, 0 };
@@ -659,7 +659,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 					LPREQUEST_REALTIME_DATA 요청패킷포 = (LPREQUEST_REALTIME_DATA)packet.bytBuffer;
 					BYTE nCount = 1;
 					요청패킷포->nStockCount = nCount;
-					strcat_s(요청패킷포->szStocks, pGame->선택된종목코드);
+					strcat_s(요청패킷포->szStocks, pEngine->선택된종목코드);
 					strcat_s(요청패킷포->szStocks, ";");
 					pBridgeKiwoom->SendPipe(_PKT_PIPE_KIWOOM_REQUEST_TRANSACTION_, 요청패킷포, sizeof(REQUEST_REALTIME_DATA));
 				}
@@ -704,15 +704,15 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 
 				저장경로 += 날짜버퍼;
 				저장경로 += ".tic";
-				for (size_t i = 0; i < pGame->nCountAccrueTick; i++)
+				for (size_t i = 0; i < pEngine->nCountAccrueTick; i++)
 				{
-					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pGame->pTickBuffer + (sizeof(TICK_DATAEX) * i));
+					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pEngine->pTickBuffer + (sizeof(TICK_DATAEX) * i));
 					//sprintf_s(szTime, "%08x", pData->nTime);
 					// 모든 체결 데이터 endian 을 변경한다
 					dk::ntohl(pData->nTime);
 				}
-				DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pGame->nCountAccrueTick);
-				size_t nSaveSize = (pGame->pTickBufferPtr - pGame->pTickBuffer);
+				DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pEngine->nCountAccrueTick);
+				size_t nSaveSize = (pEngine->pTickBufferPtr - pEngine->pTickBuffer);
 				dk::C_FILE whiteFile(저장경로.c_str()
 					, GENERIC_WRITE																// 쓰기만할꺼고
 					, 0																			// 열었을때 다른곳에서 접근 불가.
@@ -720,8 +720,8 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 					, FILE_ATTRIBUTE_NORMAL// | FILE_FLAG_WRITE_THROUGH							// 캐싱하지 않고 파일에 바로 쓴다.);
 				);
 				
-				whiteFile.Write(pGame->pTickBuffer, (ULONG)nSaveSize);
-				DBGPRINT("[ENGINE] 총 %d 개 쓰기 완료", pGame->nCountAccrueTick);
+				whiteFile.Write(pEngine->pTickBuffer, (ULONG)nSaveSize);
+				DBGPRINT("[ENGINE] 총 %d 개 쓰기 완료", pEngine->nCountAccrueTick);
 				whiteFile.Destroy();
 			}
 			if (ImGui::Button(GetUtf8("체결저장(csv)"), 버튼크기))
@@ -749,9 +749,9 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				memcpy_s(pBytePtr, _countof(임시버퍼), 임시버퍼, ::strlen(임시버퍼));
 				pBytePtr += ::strlen(임시버퍼) + 1;	// null 포함
 				//whiteFile.WriteEnd("체결시간,종목코드,매매구분,체결가,체결량,시가,고가,저가,등락율,체결강도,시가총액,누적거래대금,전일거래량대비,거래회전율,전일동시간거래량비율,매도비율,매수호가총잔량,매도호가총잔량\n");
-				for (size_t i = 0; i < pGame->nCountAccrueTick; i++)
+				for (size_t i = 0; i < pEngine->nCountAccrueTick; i++)
 				{
-					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pGame->pTickBuffer + (sizeof(TICK_DATAEX) * i));
+					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pEngine->pTickBuffer + (sizeof(TICK_DATAEX) * i));
 					//sprintf_s(szTime, "%08x", pData->nTime);
 					::sprintf_s(임시버퍼, "%d,%s,%s,%d,%d,%d,%d,%d,%0.2f,%0.2f,%d,%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%d\n"
 					//whiteFile.WriteEnd("%d,%s,%s,%d,%d,%d,%d,%d,%0.2f,%0.2f,%d,%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%d\n"
@@ -782,7 +782,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 					if (100000 < i)
 						break;
 				}
-				//DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pGame->nCountAccrueTick);
+				//DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pEngine->nCountAccrueTick);
 				size_t nSaveSize = (pBytePtr - pByte);
 				whiteFile.Write(pByte, (ULONG)nSaveSize);
 				whiteFile.Destroy();
@@ -791,7 +791,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 			}
 			if (ImGui::Button(GetUtf8("캔들준비"), 버튼크기))
 			{
-				pGame->PreReadySticks();
+				pEngine->PreReadySticks();
 			}
 			if (ImGui::Button(GetUtf8("캐시저장"), 버튼크기))
 			{
@@ -799,8 +799,8 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				디뷰("nCacheSize: %d", nCacheSize);
 				std::string path = 설정()->캐시저장소 + "Monsters/";
 				
-				for (auto itr : pGame->umObjectMonsters)
-				//auto itr = pGame->umObjectMonsters.begin();
+				for (auto itr : pEngine->umObjectMonsters)
+				//auto itr = pEngine->umObjectMonsters.begin();
 				{
 					SaveCaches(itr.first.c_str(), itr.second);
 				}
@@ -832,7 +832,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 			{	// size 호출을 분기 하나로 비용 절감.
 				if (pBridgeCreon->GetStatus() == _브릿지_종목전송완료_)
 				{
-					nCountCreonObjects = pGame->vReadyCode.size();
+					nCountCreonObjects = pEngine->vReadyCode.size();
 				}
 			}
 			ImGui::Text(GetUtf8("크레온 리스트"));
@@ -844,10 +844,10 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				for (int n = 0; n < nCountCreonObjects; n++)
 				{
 					const bool is_selected = (nCreonListIndex == n);
-					if (ImGui::Selectable(GetUtf8(pGame->vReadyCode[n].c_str()), is_selected))
+					if (ImGui::Selectable(GetUtf8(pEngine->vReadyCode[n].c_str()), is_selected))
 					{
 						nCreonListIndex = n;
-						strcpy_s(pGame->선택된종목코드, pGame->vReadyCode[n].c_str());
+						strcpy_s(pEngine->선택된종목코드, pEngine->vReadyCode[n].c_str());
 						// 선택된 종목코드의 정보를 띄우자.
 					}
 					if (is_selected)
@@ -870,7 +870,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 					LPREQUEST_REALTIME_DATA 요청패킷포 = (LPREQUEST_REALTIME_DATA)packet.bytBuffer;
 					BYTE nAccrueRequestCount = 0;
 					디뷰("요청할 종목수: %d", nCountCreonObjects);
-					//for (auto itr : pGame->벡터_종목코드)
+					//for (auto itr : pEngine->벡터_종목코드)
 					for (size_t i = 0; i < nCountCreonObjects; i++)
 					{	// 여긴 100번에 한번씩 들어온다.
 						if (!(nAccrueRequestCount % 100))
@@ -895,7 +895,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 							::memset(&packet, 0, sizeof(PACKET_BASE));
 						}
 						// 처음부터 종목코드를 szBuffer에 붙여넣기를 반복한다.
-						::strcat_s(요청패킷포->szStocks, pGame->vReadyCode[i].c_str());
+						::strcat_s(요청패킷포->szStocks, pEngine->vReadyCode[i].c_str());
 						::strcat_s(요청패킷포->szStocks, ";");
 						nAccrueRequestCount++;
 					}
@@ -924,21 +924,21 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 			//ImGui::SameLine();
 			ImGui::Text(GetUtf8("체결종목수:"));
 			ImGui::SameLine();
-			ImGui::Text("%d", pGame->nCountRealObjects);
+			ImGui::Text("%d", pEngine->nCountRealObjects);
 			ImGui::Text(GetUtf8("체결거래수:"));
 			ImGui::SameLine();
-			ImGui::Text("%lld", pGame->nCountAccrueTick);
+			ImGui::Text("%lld", pEngine->nCountAccrueTick);
 
 			static int nTransListIndex = 0; // Here we store our selection data as an index.
 			if (ImGui::BeginListBox(GetUtf8("##체결 리스트")))
 			{
-				for (int n = 0; n < pGame->nCountRealObjects; n++)
+				for (int n = 0; n < pEngine->nCountRealObjects; n++)
 				{
 					const bool is_selected = (nTransListIndex == n);
-					if (ImGui::Selectable(GetUtf8(pGame->벡터_감시중인_종목코드[n].c_str()), is_selected))
+					if (ImGui::Selectable(GetUtf8(pEngine->벡터_감시중인_종목코드[n].c_str()), is_selected))
 					{
 						nTransListIndex = n;
-						strcpy_s(pGame->선택된종목코드, pGame->벡터_감시중인_종목코드[n].c_str());
+						strcpy_s(pEngine->선택된종목코드, pEngine->벡터_감시중인_종목코드[n].c_str());
 					}
 					if (is_selected)
 					{	// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -961,7 +961,7 @@ long C_MAIN::Draw_Popup_Info(bool& _bVisible)
 		static ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
 		if (ImGui::Begin(GetUtf8("정보"), &_bVisible, flags))
 		{
-			C_OBJECT_MONSTER* pItem = pGame->umObjectMonsters[pGame->선택된종목코드];
+			C_OBJECT_MONSTER* pItem = pEngine->umObjectMonsters[pEngine->선택된종목코드];
 			if (pItem)
 			{
 				ImGui::Text(GetUtf8("종목명:"));

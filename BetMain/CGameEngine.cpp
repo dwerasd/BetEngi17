@@ -5,7 +5,7 @@
 
 
 
-C_GAME::C_GAME()
+C_ENGINE::C_ENGINE()
 {
 	//if (!pNetEngi) { pNetEngi = 넷(); }
 	
@@ -22,14 +22,14 @@ C_GAME::C_GAME()
 	}
 }
 
-C_GAME::~C_GAME()
+C_ENGINE::~C_ENGINE()
 {
 	힙해제(pTickBuffer);
 	힙해제(대용량임시버퍼);
 	dk::C_THREAD::Terminate();
 }
 
-void C_GAME::초기화()
+void C_ENGINE::초기화()
 {
 	//C_BRIDGE_KIWOOM::Init();
 	nCountAccrueTick = 0;
@@ -55,7 +55,7 @@ void C_GAME::초기화()
 	//::GetPrivateProfileStringA("path", "sticks", "", 임시버퍼, 배열크기(임시버퍼), 설정()->경로_설정파일());
 }
 
-C_OBJECT_MONSTER* C_GAME::FindMonster(LPCSTR _종목코드)
+C_OBJECT_MONSTER* C_ENGINE::FindMonster(LPCSTR _종목코드)
 {
 	UMAP_MONSTERS::iterator itr = umObjectMonsters.find(_종목코드);
 	if (umObjectMonsters.end() != itr)
@@ -65,7 +65,7 @@ C_OBJECT_MONSTER* C_GAME::FindMonster(LPCSTR _종목코드)
 	return(nullptr);
 }
 
-void C_GAME::InitMonster(LPSTOCK_INFO_CREON _종목정보)
+void C_ENGINE::InitMonster(LPSTOCK_INFO_CREON _종목정보)
 {	// 있으믄 그냥 지우고 새로 할당받는거다.
 	DSAFE_DELETE(umObjectMonsters[_종목정보->종목코드]);
 	C_OBJECT_MONSTER* pStock = umObjectMonsters[_종목정보->종목코드] = new C_OBJECT_MONSTER();
@@ -106,7 +106,7 @@ void C_GAME::InitMonster(LPSTOCK_INFO_CREON _종목정보)
 	//);
 }
 
-void C_GAME::UpdateMonster(LPSTOCK_INFO_KIWOOM _종목정보)
+void C_ENGINE::UpdateMonster(LPSTOCK_INFO_KIWOOM _종목정보)
 {
 	try
 	{
@@ -141,7 +141,7 @@ void C_GAME::UpdateMonster(LPSTOCK_INFO_KIWOOM _종목정보)
 	}
 }
 
-LPTICK_DATA C_GAME::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
+LPTICK_DATA C_ENGINE::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 {	// 일단 틱 데이터를 연속된 메모리에 변환해서 쌓는다.
 	LPTICK_DATA pTickData = nullptr;
 	if (pTickBuffer)
@@ -184,7 +184,7 @@ LPTICK_DATA C_GAME::AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData)
 	return(pTickData);
 }
 
-LPTICK_DATAEX C_GAME::AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook)
+LPTICK_DATAEX C_ENGINE::AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook)
 {	// 일단 틱 데이터를 연속된 메모리에 변환해서 쌓는다.
 	LPTICK_DATAEX pTickDataEx = nullptr;
 	if (pTickBuffer)
@@ -258,7 +258,7 @@ LPTICK_DATAEX C_GAME::AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDER
 	return(pTickDataEx);
 }
 
-LPTICK_DATAEX C_GAME::AppendTickEx(LPTICK_DATAEX _pData)
+LPTICK_DATAEX C_ENGINE::AppendTickEx(LPTICK_DATAEX _pData)
 {
 	LPTICK_DATAEX pTick = (LPTICK_DATAEX)pTickBufferPtr;
 	::memset(pTick, 0, sizeof(TICK_DATAEX));
@@ -271,7 +271,7 @@ LPTICK_DATAEX C_GAME::AppendTickEx(LPTICK_DATAEX _pData)
 	return(pTick);
 }
 
-LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
+LPTICK_DATA C_ENGINE::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 {	// 일단 틱 데이터를 연속된 메모리에 변환해서 쌓는다.
 	LPTICK_DATA pTickData = nullptr;
 	if (pTickBuffer)
@@ -325,13 +325,13 @@ LPTICK_DATA C_GAME::AppendTickKiwoom(LPKIWOOM_REALDATA_TRANSACTION _pData)
 	return(pTickData);
 }
 
-void C_GAME::PushTickData(LPKIWOOM_REALDATA_TRANSACTION _pTick)
+void C_ENGINE::PushTickData(LPKIWOOM_REALDATA_TRANSACTION _pTick)
 {	// 여기로 키움 체결 데이터가 들어오는거다.
 	LPTICK_DATAEX pTickDataEx = AppendTickEx(_pTick, umKiwoomOrderBooks[_pTick->종목코드]);
 	//HandlerTick(pTick);
 }
 
-void C_GAME::PushOrderBookData(키움_주식호가잔량포 _pData)
+void C_ENGINE::PushOrderBookData(키움_주식호가잔량포 _pData)
 {
 	LPORDERBOOK_KIWOOM pOrderBook = umKiwoomOrderBooks[_pData->종목코드];
 	if (!pOrderBook)
@@ -344,13 +344,13 @@ void C_GAME::PushOrderBookData(키움_주식호가잔량포 _pData)
 	pOrderBook->매도비율 = (float)::atof(_pData->매도비율);
 }
 
-void C_GAME::PushTickData(LPTICK_DATAEX _pData)
+void C_ENGINE::PushTickData(LPTICK_DATAEX _pData)
 {	// 종목이 있든 없든 체결데이터 저장을 위해서 메모리에 적재한다.
 	LPTICK_DATAEX pTick = AppendTickEx(_pData);
 	HandlerTick(pTick);
 }
 
-void C_GAME::HandlerTick(LPTICK_DATAEX _pTick)
+void C_ENGINE::HandlerTick(LPTICK_DATAEX _pTick)
 {	///////////////////////////////////////////////////////////////////////////////
 	// 여기에서 틱 처리 하자.
 	///////////////////////////////////////////////////////////////////////////////
@@ -398,10 +398,10 @@ void C_GAME::HandlerTick(LPTICK_DATAEX _pTick)
 //}
 }
 
-long C_GAME::LoadSticks(LPARRAY_STICK_BASE _캔들포)
+long C_ENGINE::LoadSticks(LPARRAY_STICK_BASE _캔들포)
 {
 	long nResult = 0;
-	//디뷰("C_GAME::LoadSticks(%s)", _캔들포->path.c_str());
+	//디뷰("C_ENGINE::LoadSticks(%s)", _캔들포->path.c_str());
 	if (1 == dk::파일체크(_캔들포->path.c_str()))
 	{
 		dk::C_FILE 파일(_캔들포->path.c_str());
@@ -435,7 +435,7 @@ long C_GAME::LoadSticks(LPARRAY_STICK_BASE _캔들포)
 	return(nResult);
 }
 
-void C_GAME::PreReadySticks()
+void C_ENGINE::PreReadySticks()
 {
 	//std::string path = "F:/data/ReadySticks/";
 	//std::string minute[_MAX_USE_MINUTE_] = 
@@ -482,13 +482,13 @@ void C_GAME::PreReadySticks()
 			LoadSticks(&pStock->주봉);
 			LoadSticks(&pStock->월봉);
 			세팅된종목수++;
-			//디뷰("C_GAME::PreReadySticks() - %s 완료 / 경과된시간: %0.6f", vReadyCode[종목인덱스].c_str(), 퍼포먼스타이머[2].경과된시간());
+			//디뷰("C_ENGINE::PreReadySticks() - %s 완료 / 경과된시간: %0.6f", vReadyCode[종목인덱스].c_str(), 퍼포먼스타이머[2].경과된시간());
 		}
 	}
-	디뷰("C_GAME::PreReadySticks() - 세팅된종목수: %d, 경과된시간: %0.6f", 세팅된종목수, 퍼포먼스타이머[0].경과된시간());
+	디뷰("C_ENGINE::PreReadySticks() - 세팅된종목수: %d, 경과된시간: %0.6f", 세팅된종목수, 퍼포먼스타이머[0].경과된시간());
 }
 #if 0
-void C_GAME::PushTickData(주식체결변환포 _체결변환포)
+void C_ENGINE::PushTickData(주식체결변환포 _체결변환포)
 {	// 이건 저장된 체결 데이터를 밀어넣고 테스트 하는거다.
 	// 틱 데이터를 우선 메모리에 적재한다.
 	LPTICK_DATA pTickData = (LPTICK_DATA)pTickBufferPtr;
@@ -515,12 +515,12 @@ void C_GAME::PushTickData(주식체결변환포 _체결변환포)
 }
 #endif
 
-DWORD C_GAME::ThreadFunc(LPVOID _파라미터)
+DWORD C_ENGINE::ThreadFunc(LPVOID _파라미터)
 {
 	_파라미터;
 	return(0);
 	/*
-	디뷰("C_GAME::ThreadFunc() - %x", ::GetCurrentThreadId());
+	디뷰("C_ENGINE::ThreadFunc() - %x", ::GetCurrentThreadId());
 	
 	LPPACKET_BASE pPipePacket = nullptr;
 	do
@@ -533,7 +533,7 @@ DWORD C_GAME::ThreadFunc(LPVOID _파라미터)
 			{
 				if (!pPipePacket->nPacketIndex)
 				{
-					디뷰("C_GAME::ThreadFunc() - 받음(_PKT_INDEX_NONE) 인덱스가 없음");
+					디뷰("C_ENGINE::ThreadFunc() - 받음(_PKT_INDEX_NONE) 인덱스가 없음");
 					//pLog->Write("파이프 받음(_PKT_INDEX_NONE) 인덱스가 없음");
 				}
 				else
@@ -568,7 +568,7 @@ DWORD C_GAME::ThreadFunc(LPVOID _파라미터)
 }
 
 #if 0
-void C_GAME::시뮬레이션_캔들세팅(LPCSTR _파일경로, 동적버퍼_캔들포 _캔들포)
+void C_ENGINE::시뮬레이션_캔들세팅(LPCSTR _파일경로, 동적버퍼_캔들포 _캔들포)
 {
 	if (1 == dk::파일체크(_파일경로))
 	{	// 이미 확인 했겠지만, 혹시 모를 상황을 위해 한번 더 확인하기로 한다.
@@ -600,7 +600,7 @@ void C_GAME::시뮬레이션_캔들세팅(LPCSTR _파일경로, 동적버퍼_캔
 	}
 }
 
-void C_GAME::시뮬레이션_체결데이터(주식체결변환포 _체결변환포)
+void C_ENGINE::시뮬레이션_체결데이터(주식체결변환포 _체결변환포)
 {
 	종목정보_확장포 종목포 = 종목찾기(_체결변환포->종목코드);
 	if (종목포)
@@ -610,9 +610,9 @@ void C_GAME::시뮬레이션_체결데이터(주식체결변환포 _체결변환
 	}
 }
 
-void C_GAME::시뮬레이션_분봉()
+void C_ENGINE::시뮬레이션_분봉()
 {
-	디뷰("C_GAME::시뮬레이션_분봉(start)");
+	디뷰("C_ENGINE::시뮬레이션_분봉(start)");
 	퍼포먼스타이머[0].시작();
 	char 시간[(1 << 4)], 날짜시간[(1 << 5)];
 	//size_t 카운트 = 0;
@@ -777,12 +777,12 @@ void C_GAME::시뮬레이션_분봉()
 		}
 		//if (1 < 카운트++) { break; }
 	}
-	디뷰("C_GAME::시뮬레이션_분봉(end) - %0.6f", 퍼포먼스타이머[0].경과된시간());
+	디뷰("C_ENGINE::시뮬레이션_분봉(end) - %0.6f", 퍼포먼스타이머[0].경과된시간());
 }
 
-void C_GAME::시뮬레이션_준비(LPCSTR _종목코드)
+void C_ENGINE::시뮬레이션_준비(LPCSTR _종목코드)
 {
-	디뷰("C_GAME::시뮬레이션_준비(start) - 호출한 스레드: %x", ::GetCurrentThreadId());
+	디뷰("C_ENGINE::시뮬레이션_준비(start) - 호출한 스레드: %x", ::GetCurrentThreadId());
 
 	시뮬종목포 = nullptr;
 	초기화_동적버퍼();
@@ -960,12 +960,12 @@ void C_GAME::시뮬레이션_준비(LPCSTR _종목코드)
 			디뷰("%d분봉 %d개 유맵에 준비 완료", 분봉의길이들[분봉길이인덱스], 시뮬캔들_분봉[분봉길이인덱스].size());
 		}
 		시뮬종목포 = 종목포;
-		디뷰("C_GAME::시뮬레이션_준비(%s) 파일 읽기 완료 - %0.6f", _종목코드, 퍼포먼스타이머[0].경과된시간());
+		디뷰("C_ENGINE::시뮬레이션_준비(%s) 파일 읽기 완료 - %0.6f", _종목코드, 퍼포먼스타이머[0].경과된시간());
 
 	}
 	else
 	{
-		디뷰("C_GAME::시뮬레이션_준비(%s) 종목이 없음 - %0.6f", _종목코드, 퍼포먼스타이머[0].경과된시간());
+		디뷰("C_ENGINE::시뮬레이션_준비(%s) 종목이 없음 - %0.6f", _종목코드, 퍼포먼스타이머[0].경과된시간());
 	}
 }
 #endif

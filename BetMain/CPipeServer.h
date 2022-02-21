@@ -7,6 +7,9 @@
 #include <DarkCore/DEvent.h>
 #include <DarkCore/DThread.h>
 #include <DarkCore/DUtil.h>
+#include <DarkCore/DTimer.h>
+#include <DarkCore/DLocale.h>
+
 #include <Defines/NetworkDef.h>
 
 
@@ -40,6 +43,7 @@ namespace pipe
 
 	public:
 		C_PIPE_SERVER(LPCWSTR _pRecv, LPCWSTR _pSend, C_PIPE_RECEIVER* _pReceiver);
+		C_PIPE_SERVER(LPCSTR _pRecv, LPCSTR _pSend, C_PIPE_RECEIVER* _pReceiver);
 		~C_PIPE_SERVER();
 
 		int Recv(LPPACKET_BASE _pData);
