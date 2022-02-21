@@ -41,6 +41,7 @@ static C_MAIN* pMain = nullptr;
 static C_BRIDGE_BASE* pBridgeCreon = nullptr;
 LPVOID __stdcall BridgeCallbackCreon(ULONG_PTR _dwMessage, LPVOID _pData)
 {
+	_pData;
 	try
 	{
 		switch (_dwMessage)

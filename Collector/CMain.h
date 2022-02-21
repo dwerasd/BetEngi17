@@ -37,7 +37,7 @@ private:
 
 	LPCWSTR pClassName{ nullptr };
 
-	std::string 기본경로, 설정파일;
+	
 	dk::DPOINT 메인윈도우위치;
 	dk::DSIZE 메인윈도우크기;
 
@@ -65,6 +65,8 @@ public:
 	~C_MAIN();
 
 	bool bHighPerformance{ false };
+
+	std::string 기본경로, 설정파일;
 
 	ULONG nCountAccrueTick{ 0 };		// 들어온 체결틱 개수	
 	LPBYTE pTickBuffer{ nullptr }, pTickBufferPtr{ nullptr };

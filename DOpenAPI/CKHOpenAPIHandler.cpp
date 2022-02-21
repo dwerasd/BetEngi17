@@ -205,7 +205,6 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			if (pPipe) { pPipe->Send(&packet); }
 			if (pNet) { pNet->Send(_네트워크패킷_키움_주식체결_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION)); }
 		}
-		
 		else if (!strcmp(_sRealType, "주식호가잔량"))
 		{
 			// [139] 매도비율
@@ -214,7 +213,7 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			PACKET_BASE packet =
 			{	// 메모리 할당과 복사를 한번만 하기 위해 여기에서 PACKET_BASE 를 할당한다.
 				sizeof(키움_주식호가잔량)
-				, _브릿지패킷_키움_주식호가잔량_
+				, _PKT_PIPE_KIWOOM_RECEIVE_TRANSACTION_
 				, { 0 }
 			};
 			키움_주식호가잔량포 pData = (키움_주식호가잔량포)&packet.bytBuffer[0];

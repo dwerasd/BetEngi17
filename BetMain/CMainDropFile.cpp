@@ -110,17 +110,17 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 					dk::C_FILE file(szPath);
 					//KIWOOM_REALDATA_TRANSACTION data;
 					LPBYTE pBuffer = file.GetFileData();
-					size_t 갯수 = file.GetReadSize() / sizeof(TICK_DATA);
+					size_t 갯수 = file.GetReadSize() / sizeof(TICK_DATAEX);
 					디뷰("체결틱갯수: %d", 갯수);
 					퍼포먼스타이머.시작();
 					for (size_t i = 0; i < 갯수; i++)
 					{
-						LPTICK_DATA pTick = (LPTICK_DATA)pBuffer;
+						LPTICK_DATAEX pTick = (LPTICK_DATAEX)pBuffer;
 						dk::ntohl(pTick->nTime);
 
 
-						//pGame->PushTickData(pTick);
-						pBuffer += sizeof(TICK_DATA);
+						pGame->PushTickData(pTick);
+						pBuffer += sizeof(TICK_DATAEX);
 					}
 					디뷰("완료: %0.6f", 퍼포먼스타이머.경과된시간());
 				}

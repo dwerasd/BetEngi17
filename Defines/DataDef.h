@@ -522,6 +522,37 @@ typedef struct _TICK_DATAEX
 	float 매도비율;
 } TICK_DATAEX, *LPTICK_DATAEX;
 
+typedef struct _TICK_DATA_CREON
+{	// 저장할 버퍼
+	ULONG nSequence;			// 받은 순서 ( 키움으로부터 )
+	char szCode[8];				// "A005930"
+	char nTransType;			// 1 = 매수, 2 = 매도, 3 = 단일가매매(동시호가)
+	ULONG nTime;				// 체결시간, 파일 이름이 11시59분31초, 여기 뒤에 밀리초 3자리 붙인다.
+	float fPrice;				// 체결가격(선물 때문에 float 으로 저장하자)
+	ULONG nTransVolume;			// 체결량
+	ULONG nAccrueVolume;		// 누적거래량
+	float 최우선매도호가;		// 
+	float 최우선매수호가;		// 체결량
+} TICK_DATA_CREON, *LPTICK_DATA_CREON;
+
+typedef struct _TICK_DATA_CREONEX
+	: public _TICK_DATA_CREON
+{	// 저장할 버퍼
+	float 시가;
+	float 고가;
+	float 저가;
+	ULONG 누적거래대금;
+	ULONG 시가총액_억;
+	float 등락율;
+	float 전일거래량대비_비율;
+	float 거래회전율;
+	float 체결강도;
+	float 전일동시간거래량비율;
+	ULONG 매도호가총잔량;
+	ULONG 매수호가총잔량;
+	float 매도비율;
+} TICK_DATA_CREONEX, *LPTICK_DATA_CREONEX;
+
 //typedef struct _TICK_DATAF
 //{	// 저장할 버퍼
 //	ULONG nSequence;			// 받은 순서 ( 키움으로부터 )

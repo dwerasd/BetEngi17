@@ -98,7 +98,7 @@ namespace net
 	{
 		try
 		{
-			DBGPRINT("[ENGINE] 받음: %i / %s, 이벤트를 생성한다", nReciveSize, (bytRecvBuf + sizeof(PACKET_HEADER)));
+			DBGPRINT("C_NET_CLIENT::HandleRecived() - 받음: %i / %s, 이벤트를 생성한다", nReciveSize, (bytRecvBuf + sizeof(PACKET_HEADER)));
 			// 사실 처리할 패킷은 없다. 보내기만 할꺼니까.
 
 		}

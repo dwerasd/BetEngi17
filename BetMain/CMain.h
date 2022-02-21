@@ -157,9 +157,6 @@ public:
 	C_BRIDGE_KIWOOM* pBridgeKiwoom{ nullptr };
 	C_BRIDGE_BASE* pBridgeEBest{ nullptr };
 
-	void 클라이언트_실행(BYTE _증권사, BYTE _실행모드 = 0);
-	void 클라이언트_종료(BYTE _증권사);
-
 	void PushOrder(메인오더포 _오더);
 
 	bool OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam);

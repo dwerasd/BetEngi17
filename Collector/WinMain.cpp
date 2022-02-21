@@ -24,13 +24,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE _hInstance, _In_opt_ HINSTANCE _hPrevInstan
 	{	// 자신을 실행하고 종료하는 경우 기다리기 위해.
 		do
 		{
-			if (!mutex.Create(L"BetServ")) { break; }	// 뮤텍스 생성에 성공하면 빠져나간다.
+			if (!mutex.Create(L"Collector")) { break; }	// 뮤텍스 생성에 성공하면 빠져나간다.
 			dk::멈춰(200);
 		} while (true);
 	}
 	else
 	{
-		mutex.Create(L"BetServ");
+		mutex.Create(L"Collector");
 	}
 	try
 	{

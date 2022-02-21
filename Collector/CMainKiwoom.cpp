@@ -140,7 +140,7 @@ LPVOID __stdcall BridgeCallbackKiwoom(ULONG_PTR _dwMessage, LPVOID _pData)
 		case _브릿지패킷_키움_예수금상세현황받음_:
 			do
 			{
-				키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)_pData;
+				//키움_예수금상세현황포 현황포 = (키움_예수금상세현황포)_pData;
 				//pBridgeKiwoom->키움_예수금.예수금 = 현황포->예수금;
 				//pBridgeKiwoom->키움_예수금.출금가능금액 = 현황포->출금가능금액;
 				//pBridgeKiwoom->키움_예수금.주문가능금액 = 현황포->주문가능금액;

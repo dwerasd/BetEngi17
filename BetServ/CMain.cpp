@@ -58,16 +58,17 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 		case ID_BTN_SAVE:
 			do
 			{
-				std::string 저장경로 = "F:/data/ticks/";
-				char 날짜버퍼[(1 << 5)] = { 0 };
+				char 임시버퍼[_MAX_PATH] = { 0 };
+				::GetPrivateProfileStringA("path", "save", "F:/data/ticks/", 임시버퍼, 배열크기(임시버퍼), pMain->설정파일.c_str());
+				std::string 저장경로 = 임시버퍼;
 
 				::time_t tToday = ::time(0);		// 오늘 날짜를 구함
 				::tm t;
 				::localtime_s(&t, &tToday);
-				::strftime(날짜버퍼, _countof(날짜버퍼), "%Y%m%d", &t);		// "20201215", 오늘 날짜 저장용
-
-				저장경로 += 날짜버퍼;
+				::strftime(임시버퍼, _countof(임시버퍼), "%Y%m%d", &t);		// "20201215", 오늘 날짜 저장용
+				저장경로 += 임시버퍼;
 				저장경로 += ".tick";
+
 				for (size_t i = 0; i < pMain->nCountAccrueTick; i++)
 				{
 					LPTICK_DATA pData = (LPTICK_DATA)(pMain->pTickBuffer + (sizeof(TICK_DATA) * i));

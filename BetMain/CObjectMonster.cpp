@@ -318,7 +318,7 @@ void C_OBJECT_MONSTER::PushTick(LPTICK_DATAEX _pTick)
 					);
 				}
 				else
-				{	// 매도나 매수 체결이 발생한적이 없다면 단일가 매매만 진행하는 종목이다.
+				{	// 매도나 매수 체결이 발생한적이 없다면 단일가 매매만 진행하는 종목이다.( 초저유동성종목 )
 					디뷰("C_OBJECT_MONSTER::PushTick(LPTICK_DATA) - [누락/단일] 종목: %s / 시간: %d / 이전틱누적: %d + 현재틱거래량: %d = 현재틱누적: %d / 이전틱+현재거래량: %d / 차이: %d"
 						, _pTick->szCode, _pTick->nTime, 누적체결량, _pTick->nTransVolume, _pTick->nAccrueVolume, (누적체결량 + _pTick->nTransVolume)
 						, (_pTick->nAccrueVolume - (누적체결량 + _pTick->nTransVolume))	// 차이 = 현재틱누적 - (이전틱누적 + 현재틱거래량)

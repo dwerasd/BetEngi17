@@ -168,17 +168,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CBridgeBase.h" />
     <ClInclude Include="CMain.h" />
     <ClInclude Include="CMemDB.h" />
     <ClInclude Include="CNetServer.h" />
+    <ClInclude Include="CPipeServer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CBridgeBase.cpp" />
     <ClCompile Include="CMain.cpp" />
     <ClCompile Include="CMemDB.cpp" />
     <ClCompile Include="CNetServer.cpp" />
+    <ClCompile Include="CPipeServer.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>

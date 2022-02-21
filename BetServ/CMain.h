@@ -19,6 +19,7 @@
 #include <Defines/NetworkDef.h>
 
 #include "CMemDB.h"
+#include "CBridgeBase.h"
 #include "CNetServer.h"
 #include "resource.h"
 
@@ -39,7 +40,7 @@ private:
 	LPCWSTR pClassName{ nullptr };
 
 	C_MEMDB* pMemDB{ nullptr };
-	std::string 기본경로, 설정파일;
+
 	dk::DPOINT 메인윈도우위치;
 	dk::DSIZE 메인윈도우크기;
 
@@ -68,6 +69,8 @@ public:
 
 	bool bHighPerformance{ false };
 
+	std::string 기본경로, 설정파일;
+
 	ULONG nCountAccrueTick{ 0 };		// 들어온 체결틱 개수	
 	LPBYTE pTickBuffer{ nullptr }, pTickBufferPtr{ nullptr };
 	LPBYTE pTickBufferEBest{ nullptr }, pTickBufferPtrEBest{ nullptr };
@@ -80,13 +83,17 @@ public:
 	void Display();
 	void Destroy() noexcept;
 	
+	void ExitProcess() { bExitProcess = true; }
+
+	C_BRIDGE_BASE* pBridgeCreon{ nullptr };
+	C_BRIDGE_BASE* pBridgeKiwoom{ nullptr };
+	C_BRIDGE_BASE* pBridgeEBest{ nullptr };
+
 	void ReceivePacket(LPNET_PACKET_BUNDLE _pData);
 
 	LPTICK_DATA AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData);
 	LPTICK_DATAEX AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook);
 
-
-	void ExitProcess() { bExitProcess = true; }
 	void ShowWindow(bool _bShow) { bShowWindow = _bShow; }
 	
 	bool OnWindowMessage(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM _lParam);
