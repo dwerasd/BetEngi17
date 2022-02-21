@@ -11,6 +11,5 @@
 텔레그램: @darkfunc</br>
 </br>
 ## 기부
-[Toss(Korean)][TOSS]</br>
+<a href="https://toss.me/도담김필동" rel="nofollow">Toss(Korean)</a></p>
 </br>
-[TOSS]: https://toss.me/도담김필동
