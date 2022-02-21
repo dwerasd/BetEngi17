@@ -9,6 +9,7 @@
 
 ## 연락수단
 텔레그램: @darkfunc</br>
+이메일: dwerasd@gmail.com
 </br>
 ## 기부
 <a href="https://toss.me/도담김필동" rel="nofollow">Toss(Korean)</a></p>
