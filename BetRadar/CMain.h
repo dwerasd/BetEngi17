@@ -19,10 +19,11 @@
 #include <Defines/DataDef.h>
 #include <Defines/NetworkDef.h>
 
+#include "CZmqBase.h"
 #include "resource.h"
 
 #include "CNetClient.h"
-
+#include "CEngine.h"
 
 
 class C_MAIN
@@ -47,7 +48,7 @@ private:
 	ULONG_PTR nSecondTimer{ 0 };
 	ULONG_PTR nFrame{ 0 };
 
-	net::C_NET_CLIENT* pNetClient{ nullptr };
+	
 	moodycamel::BlockingConcurrentQueue<LPNET_PACKET_BUNDLE> queueNetworkPackets;
 	void ReceivePacket(LPNET_PACKET_BUNDLE _pData);
 	DWORD ThreadFunc(LPVOID _pParam);
@@ -57,7 +58,13 @@ public:
 	~C_MAIN();
 
 	std::string 기본경로, 설정파일;
+	C_ENGINE* pEngine{ nullptr };
+	net::C_NET_CLIENT* pNetClient{ nullptr };
+	size_t nCountSend{ 0 };
 
+#if defined(_USE_ZEROMQ_)
+	C_ZMQ_SENDER* pZmqSender{ nullptr };
+#endif
 	bool Init(LPCWSTR _wszClassName, LPCWSTR _wszWindowName, bool _bWindowMode = true);
 	bool Create();
 	long Calculate();
@@ -71,5 +78,5 @@ public:
 	void SetHighPerformance(bool _b = true) { bHighPerformance = _b; }
 	void StopHighPerformance(bool _b = false) { bHighPerformance = _b; }
 
-	
+	size_t DropFile(LPCSTR _pPath);
 };

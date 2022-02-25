@@ -118,7 +118,6 @@ DWORD C_FILE_HANDLER::ThreadFunc(LPVOID )
 						LPTICK_DATAEX pTick = (LPTICK_DATAEX)pBuffer;
 						dk::ntohl(pTick->nTime);
 
-
 						pEngine->PushTickData(pTick);
 						pBuffer += sizeof(TICK_DATAEX);
 					}

@@ -29,9 +29,9 @@ void C_KH_OPEN_API::SetHandler(pipe::C_PIPE_CLIENT* _pHandler)
 	pPipe = _pHandler;
 }
 
-void C_KH_OPEN_API::SetNetHandler(net::C_NET_CLIENT* _pHandler)
+void C_KH_OPEN_API::SetHandler(C_ZMQ_SENDER* _pHandler)
 {
-	pNet = _pHandler;
+	pZmqSender = _pHandler;
 }
 
 void C_KH_OPEN_API::OnEventConnect(long _nErrCode)
@@ -202,8 +202,8 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			GetCommRealDataEx(pData->시가총액, _countof(pData->시가총액), _sRealKey, 311);							// 시가총액
 			GetCommRealDataEx(pData->전일동시간거래량비율, _countof(pData->전일동시간거래량비율), _sRealKey, 851);	// 전일동시간거래량비율
 
-			if (pPipe) { pPipe->Send(&packet); }
-			if (pNet) { pNet->Send(_네트워크패킷_키움_주식체결_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION)); }
+			pPipe->Send(&packet);
+			pZmqSender->Send(&packet, sizeof(PACKET_HEADER) + sizeof(KIWOOM_REALDATA_TRANSACTION), ZMQ_DONTWAIT);
 		}
 		else if (!strcmp(_sRealType, "주식호가잔량"))
 		{
@@ -225,8 +225,8 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			GetCommRealDataEx(pData->매수호가총잔량, _countof(pData->매수호가총잔량), _sRealKey, 125);
 			GetCommRealDataEx(pData->매도비율, _countof(pData->매도비율), _sRealKey, 139);
 			
-			if (pPipe) { pPipe->Send(&packet); }
-			if (pNet) { pNet->Send(_네트워크패킷_키움_주식호가잔량_, (LPBYTE)packet.bytBuffer, sizeof(키움_주식호가잔량)); }
+			pPipe->Send(&packet);
+			pZmqSender->Send(&packet, sizeof(PACKET_HEADER) + sizeof(키움_주식호가잔량), ZMQ_DONTWAIT);
 		}
 		/*
 		else if (!strcmp(_sRealType, "주식시세"))
@@ -276,11 +276,8 @@ void C_KH_OPEN_API::OnReceiveRealData(LPCSTR _sRealKey, LPCSTR _sRealType, LPCST
 			::strcpy_s(pData->장시작예상잔여시간, sizeof(pData->장시작예상잔여시간), GetCommRealData(_sRealKey, 214).GetBuffer());
 
 			packet.nPacketSize = sizeof(키움_장시작시간);
-			if (pPipe) { pPipe->Send(&packet); }
-			if (pNet)
-			{
-				pNet->Send(_브릿지패킷_키움_장시작시간_, (LPBYTE)packet.bytBuffer, sizeof(KIWOOM_REALDATA_TRANSACTION));
-			}
+			pPipe->Send(&packet);
+			//pZmqSender->Send(&packet, sizeof(PACKET_HEADER) + sizeof(키움_장시작시간포), ZMQ_DONTWAIT);
 			//DBGPRINT("장시작시간 도착 %s / %s", strType, strRemainTime);
 		}
 		/*

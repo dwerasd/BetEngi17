@@ -51,7 +51,10 @@ namespace net
 			nPort = _nPort;
 			::strcpy_s(szRemoteAddress, sizeof(szRemoteAddress), _pStrIP);
 
-			sock.SetNagle(1);	// nagle off
+			if (!sock.SetNagle(1))
+			{
+				디뷰("C_NET_CLIENT::Connect() - nagle off 실패");
+			}
 			nSocket = sock.Detatch();
 
 			Send(_PKT_NET_CONNECTED_);
@@ -134,7 +137,7 @@ namespace net
 				{
 					if (INVALID_SOCKET != nSocket)
 					{
-						BYTE bytRecvBuf[(1 << 14)] = { 0 };
+						BYTE bytRecvBuf[_MAX_PACKET_SIZE_] = { 0 };
 						int nReciveSize = ::recv(nSocket, (char*)bytRecvBuf, sizeof(bytRecvBuf), 0);
 						// 메시지가 들어오면
 						if (0 < nReciveSize)

@@ -16,20 +16,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="서버">
+    <Filter Include="통신">
       <UniqueIdentifier>{45f65438-b12e-4e3a-9999-00a6e06e722c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="서버\TCP서버">
-      <UniqueIdentifier>{25a2dcaf-9e9b-462a-b184-b75233dd9239}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="서버\PIPE서버">
-      <UniqueIdentifier>{f1b9664e-5757-48d7-a711-fa20f2417ccf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="서버\PIPE서버\브릿지">
-      <UniqueIdentifier>{dafbcac0-2fb3-4ba6-96da-1d04f3bae00c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="엔진">
-      <UniqueIdentifier>{a06b4808-6702-4d49-8145-6ea714c5828f}</UniqueIdentifier>
+    <Filter Include="통신\ZeroMQ">
+      <UniqueIdentifier>{9024473c-256a-4e9d-80a3-396ceaef764a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -45,14 +36,8 @@
     <ClInclude Include="CMain.h">
       <Filter>기본\헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CNetServer.h">
-      <Filter>서버\TCP서버</Filter>
-    </ClInclude>
-    <ClInclude Include="CPipeServer.h">
-      <Filter>서버\PIPE서버</Filter>
-    </ClInclude>
-    <ClInclude Include="CBridgeBase.h">
-      <Filter>서버\PIPE서버\브릿지</Filter>
+    <ClInclude Include="CZmqBase.h">
+      <Filter>통신\ZeroMQ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -75,15 +60,6 @@
     <ClCompile Include="CMain.cpp">
       <Filter>기본\소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CNetServer.cpp">
-      <Filter>서버\TCP서버</Filter>
-    </ClCompile>
-    <ClCompile Include="CPipeServer.cpp">
-      <Filter>서버\PIPE서버</Filter>
-    </ClCompile>
-    <ClCompile Include="CBridgeBase.cpp">
-      <Filter>서버\PIPE서버\브릿지</Filter>
-    </ClCompile>
     <ClCompile Include="CMainKiwoom.cpp">
       <Filter>기본\소스 파일</Filter>
     </ClCompile>
@@ -92,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="CMainCreon.cpp">
       <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CZmqBase.cpp">
+      <Filter>통신\ZeroMQ</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

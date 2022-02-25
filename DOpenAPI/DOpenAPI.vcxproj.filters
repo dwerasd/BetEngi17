@@ -37,6 +37,9 @@
     <Filter Include="통신\네트워크">
       <UniqueIdentifier>{c22d3954-6286-4ae0-92ee-409c112a9ea2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="통신\ZeroMQ">
+      <UniqueIdentifier>{cf203229-2438-4fb7-a16f-515d4b6cf302}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -72,6 +75,9 @@
     <ClInclude Include="CNetClient.h">
       <Filter>통신\네트워크</Filter>
     </ClInclude>
+    <ClInclude Include="CZmqBase.h">
+      <Filter>통신\ZeroMQ</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -97,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="CPipeHandler.cpp">
       <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CZmqBase.cpp">
+      <Filter>통신\ZeroMQ</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

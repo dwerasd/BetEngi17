@@ -18,7 +18,7 @@
 #define ID_BTN_HIDE                     1101
 #define ID_BTN_SAVE                     1102
 #define ID_BTN_SAVE_CSV                 1103
-#define IDC_STATUS_USER                 1201
+#define IDC_COUNT_TICKDATA              1201
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

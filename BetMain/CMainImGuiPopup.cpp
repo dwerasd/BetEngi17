@@ -705,7 +705,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				저장경로 += 날짜버퍼;
 				저장경로 += ".tic";
 				for (size_t i = 0; i < pEngine->nCountAccrueTick; i++)
-				{
+				{	// endian 을 변경해줘야하나? 계산기로 풀어볼꺼 아니면 안해줘도 될거 같은데 
 					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pEngine->pTickBuffer + (sizeof(TICK_DATAEX) * i));
 					//sprintf_s(szTime, "%08x", pData->nTime);
 					// 모든 체결 데이터 endian 을 변경한다
@@ -750,7 +750,7 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 				pBytePtr += ::strlen(임시버퍼) + 1;	// null 포함
 				//whiteFile.WriteEnd("체결시간,종목코드,매매구분,체결가,체결량,시가,고가,저가,등락율,체결강도,시가총액,누적거래대금,전일거래량대비,거래회전율,전일동시간거래량비율,매도비율,매수호가총잔량,매도호가총잔량\n");
 				for (size_t i = 0; i < pEngine->nCountAccrueTick; i++)
-				{
+				{	// 이게 tic 파일에서 읽은걸 변환할때는 endian 이 풀려있는데, 체결 그대로 저장하려면 풀어줘야한다.
 					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pEngine->pTickBuffer + (sizeof(TICK_DATAEX) * i));
 					//sprintf_s(szTime, "%08x", pData->nTime);
 					::sprintf_s(임시버퍼, "%d,%s,%s,%d,%d,%d,%d,%d,%0.2f,%0.2f,%d,%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%d\n"
@@ -774,13 +774,14 @@ long C_MAIN::Draw_Popup_Order(bool& _bVisible)
 						, pData->매수호가총잔량
 						, pData->매도호가총잔량
 					);
-					memcpy_s(pBytePtr, _countof(임시버퍼), 임시버퍼, ::strlen(임시버퍼));
+					memcpy_s(pBytePtr, _countof(임시버퍼), 임시버퍼, ::strlen(임시버퍼)+1);
+					//디뷰("%s", 임시버퍼);
 					pBytePtr += ::strlen(임시버퍼) + 1;	// null 포함
 					//whiteFile.WriteStr
 					//디뷰("%s / %s", 날짜버퍼, 임시버퍼);
 					//dk::ntohl(pData->nTime);
-					if (100000 < i)
-						break;
+					//if (100000 < i)
+					//	break;
 				}
 				//DBGPRINT("[ENGINE] 총 %d 개 endian 변환 완료", pEngine->nCountAccrueTick);
 				size_t nSaveSize = (pBytePtr - pByte);

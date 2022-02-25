@@ -15,6 +15,7 @@
 #include <DOpenSources/blockingconcurrentqueue.h>
 
 #include "CNetClient.h"
+#include "CZmqBase.h"
 
 #include "resource.h"		// 주 기호입니다.
 #include "CKHOpenAPICtrl.h"			// 키움 필수
@@ -50,8 +51,8 @@ public:
 
 	C_KH_OPEN_API* 키움OCX{ nullptr };			// 키움 필수
 
+	C_ZMQ_SENDER* pZmqSender{ nullptr };
 	pipe::C_PIPE_CLIENT* pPipe{ nullptr };
-	net::C_NET_CLIENT* pNetClient{ nullptr };
 
 	void PushReceivePacket(LPPACKET_BASE _pData);
 	

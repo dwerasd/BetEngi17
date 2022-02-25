@@ -522,6 +522,24 @@ typedef struct _TICK_DATAEX
 	float 매도비율;
 } TICK_DATAEX, *LPTICK_DATAEX;
 
+typedef struct _TICK_DATAEXF
+	: public _TICK_DATA
+{	// 저장할 버퍼
+	float 시가;
+	float 고가;
+	float 저가;
+	float 등락율;
+	float 전일거래량대비_비율;
+	float 거래회전율;
+	float 체결강도;
+	float 전일동시간거래량비율;
+	ULONG 누적거래대금;
+	ULONG 시가총액_억;
+	ULONG 매도호가총잔량;
+	ULONG 매수호가총잔량;
+	float 매도비율;
+} TICK_DATAEXF, *LPTICK_DATAEXF;
+
 typedef struct _TICK_DATA_CREON
 {	// 저장할 버퍼
 	ULONG nSequence;			// 받은 순서 ( 키움으로부터 )

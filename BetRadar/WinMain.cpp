@@ -19,6 +19,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE _hInstance, _In_opt_ HINSTANCE _hPrevInstan
 	UNREFERENCED_PARAMETER(_nCmdShow);
 
 	// TODO: 여기에 코드를 입력합니다.
+	/*
 	dk::C_MUTEX mutex;
 	if (!wcscmp(_lpCmdLine, L"restart"))
 	{	// 자신을 실행하고 종료하는 경우 기다리기 위해.
@@ -32,9 +33,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE _hInstance, _In_opt_ HINSTANCE _hPrevInstan
 	{
 		mutex.Create(L"BetRadar");
 	}
+	*/
 	try
 	{
-		if (!mutex.CheckError())
+		//if (!mutex.CheckError())
 		{
 			// 전역 문자열을 초기화합니다.
 			::LoadStringW(_hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

@@ -8,6 +8,7 @@
 #include <DarkCore/DUtil.h>
 #include <DarkCore/DMemory.h>
 #include <DarkCore/DTimer.h>
+#include <DarkCore/DThread.h>
 #include <DarkCore/DFile.h>
 #pragma comment(lib, "DarkCore")
 
@@ -18,17 +19,15 @@
 #include <Defines/DataDef.h>
 #include <Defines/NetworkDef.h>
 
-#include "CBridgeBase.h"
-#include "CNetServer.h"
 #include "resource.h"
+#include "CZmqBase.h"
 
 
-typedef std::unordered_map<std::string, inet::C_SESSION*> UMAP_SESSIONS;
+
 typedef std::unordered_map<std::string, LPORDERBOOK_KIWOOM> UMAP_ORDERBOOKS;
 
 class C_MAIN
 	: public dk::C_SINGLETON<C_MAIN>	// 단 한개만 생성되고 GetInstance 활성
-	, public inet::C_IOCP_CALLBACK
 	, public dk::C_THREAD
 {
 private:
@@ -48,15 +47,11 @@ private:
 	ULONG_PTR nSecondTimer{ 0 };
 	ULONG_PTR nFrame{ 0 };
 
-	net::C_NET_SERVER* pNet{ nullptr };
-
-	typedef std::unordered_map<std::string, net::LPUSER_INFO> UMAP_USERS;
-	UMAP_USERS umapUsers;
-
-	std::vector<inet::C_SESSION*> vSessions;
-
 	size_t nCountRealObjects{ 0 };		// 감시중인 종목 수		( size() 호출 비용을 줄인다 )
-	
+
+	C_ZMQ_RECIVER* pZmqReciver{ nullptr };
+	//C_ZMQ_SENDER* pZmqCreon{ nullptr };
+	//C_ZMQ_SENDER* pZmqKiwoom{ nullptr };
 
 	moodycamel::BlockingConcurrentQueue<LPNET_PACKET_BUNDLE> queueNetworkPackets;
 	DWORD ThreadFunc(LPVOID _pParam);
@@ -83,14 +78,9 @@ public:
 	
 	void ExitProcess() { bExitProcess = true; }
 
-	C_BRIDGE_BASE* pBridgeCreon{ nullptr };
-	C_BRIDGE_BASE* pBridgeKiwoom{ nullptr };
-	C_BRIDGE_BASE* pBridgeEBest{ nullptr };
-
 	void ReceivePacket(LPNET_PACKET_BUNDLE _pData);
 
-	LPTICK_DATA AppendTick(LPKIWOOM_REALDATA_TRANSACTION _pData);
-	LPTICK_DATAEX AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook);
+	LPTICK_DATAEXF AppendTickEx(LPKIWOOM_REALDATA_TRANSACTION _pData, LPORDERBOOK_KIWOOM _pOrderBook);
 
 	void ShowWindow(bool _bShow) { bShowWindow = _bShow; }
 	

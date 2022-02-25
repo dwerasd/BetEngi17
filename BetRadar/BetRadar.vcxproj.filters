@@ -22,6 +22,12 @@
     <Filter Include="통신\TCP클라">
       <UniqueIdentifier>{35e53823-51e5-44b1-b29e-9415c2b5808c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="엔진">
+      <UniqueIdentifier>{7c8ed8a4-7bf5-48ad-9116-da94db4f742d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="통신\ZeroMQ">
+      <UniqueIdentifier>{c01c787d-78e8-4bcc-9b3b-6e92948b5352}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -38,6 +44,12 @@
     </ClInclude>
     <ClInclude Include="CNetClient.h">
       <Filter>통신\TCP클라</Filter>
+    </ClInclude>
+    <ClInclude Include="CEngine.h">
+      <Filter>엔진</Filter>
+    </ClInclude>
+    <ClInclude Include="CZmqBase.h">
+      <Filter>통신\ZeroMQ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +74,15 @@
     </ClCompile>
     <ClCompile Include="CNetClient.cpp">
       <Filter>통신\TCP클라</Filter>
+    </ClCompile>
+    <ClCompile Include="CMainDropFile.cpp">
+      <Filter>기본\소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CEngine.cpp">
+      <Filter>엔진</Filter>
+    </ClCompile>
+    <ClCompile Include="CZmqBase.cpp">
+      <Filter>통신\ZeroMQ</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

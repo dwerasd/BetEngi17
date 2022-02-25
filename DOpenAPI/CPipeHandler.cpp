@@ -14,10 +14,9 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 {
 	_pParam;
 
-	if (!pNetClient)
+	if (!pZmqSender)
 	{
-		pNetClient = new net::C_NET_CLIENT("127.0.0.1");
-		pNetClient->ThreadStart();
+		pZmqSender = new C_ZMQ_SENDER("localhost", 5000);
 	}
 	if (!키움OCX) { 키움OCX = new C_KH_OPEN_API(); }
 
@@ -29,7 +28,7 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 	}
 	pPipe->ThreadStart();
 	키움OCX->SetHandler(pPipe);
-	키움OCX->SetNetHandler(pNetClient);
+	키움OCX->SetHandler(pZmqSender);
 
 	LPPACKET_BASE pPipePacket = nullptr;
 	do
@@ -160,12 +159,7 @@ DWORD COpenAPI::ThreadFunc(LPVOID _pParam)
 							if (-1 != strExclude7.Find(itr.c_str())) { pStockInfo->코넥스 = true; }		// ETF
 
 							//DBGPRINT("sizeof(PACKET_BASE): %d, sizeof(PipePacket.bytBuffer): %d", sizeof(PACKET_BASE), netPacket.nPacketSize);
-
 							pPipe->Send(&netPacket);
-							//if (pNetClient->IsConnect())
-							//{
-							//	pNetClient->Send(_PKT_NET_RECEIVE_STOCKINFO_KIWOOM_, (LPBYTE)netPacket.bytBuffer, sizeof(STOCK_INFO_KIWOOM));
-							//}
 						}
 						pPipe->Send(_PKT_PIPE_KIWOOM_SUCCEEDED_STOCK_INFO_);
 						listStockCodes.clear();

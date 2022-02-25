@@ -119,6 +119,7 @@
     <ClInclude Include="CKHOpenAPICtrl.h" />
     <ClInclude Include="CNetClient.h" />
     <ClInclude Include="CPipeClient.h" />
+    <ClInclude Include="CZmqBase.h" />
     <ClInclude Include="DOpenAPI.h" />
     <ClInclude Include="DOpenAPIDlg.h" />
     <ClInclude Include="framework.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="CNetClient.cpp" />
     <ClCompile Include="CPipeClient.cpp" />
     <ClCompile Include="CPipeHandler.cpp" />
+    <ClCompile Include="CZmqBase.cpp" />
     <ClCompile Include="DOpenAPI.cpp" />
     <ClCompile Include="DOpenAPIDlg.cpp" />
     <ClCompile Include="pch.cpp">

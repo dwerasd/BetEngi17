@@ -55,6 +55,74 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 			pMain->ShowWindow(false);
 			pMain->SetHighPerformance();
 			break;
+		case ID_BTN_TEST:
+			do
+			{	// 파일로 저장이 아니라 네트워크 전송으로 고친다. 테스트니까
+				static ULONG_PTR nSecondTimer = 0;
+				for (size_t i = 0; i < pMain->pEngine->nCountAccrueTick; i++)
+				{
+					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pMain->pEngine->pTickBuffer + (sizeof(TICK_DATAEX) * i));
+					PACKET_BASE packet =
+					{
+						sizeof(TICK_DATAEX)
+						, _네트워크패킷_테스트_체결_
+						, 0
+					};
+					memcpy_s(packet.bytBuffer, _countof(packet.bytBuffer), pData, sizeof(TICK_DATAEX));
+					pMain->pZmqSender->Send(&packet, sizeof(PACKET_HEADER) + sizeof(TICK_DATAEX), 0);
+					//pMain->pNetClient->Send(&packet);
+					pMain->nCountSend++;
+
+					ULONG_PTR nTickCount = dk::GetTickCount();
+					if (nTickCount - nSecondTimer >= 1000)
+					{
+						디뷰(L"전송수 %d", pMain->nCountSend);
+
+						nSecondTimer = nTickCount;
+					}
+					//if (100 < pMain->nCountSend)
+					//	break;
+				}
+				디뷰(L"전송수 %d", pMain->nCountSend);
+				/*
+				LPBYTE pByte = (LPBYTE)힙할당(4000000000);
+				LPBYTE pBytePtr = pByte;
+				char 임시버퍼[(1 << 10)] = "체결시간,종목코드,매매구분,체결가,체결량,시가,고가,저가,등락율,체결강도,시가총액,누적거래대금,전일거래량대비,거래회전율,전일동시간거래량비율,매도비율,매수호가총잔량,매도호가총잔량\n";
+				memcpy_s(pBytePtr, _countof(임시버퍼), 임시버퍼, ::strlen(임시버퍼));
+				pBytePtr += ::strlen(임시버퍼) + 1;	// null 포함
+				//whiteFile.WriteEnd("체결시간,종목코드,매매구분,체결가,체결량,시가,고가,저가,등락율,체결강도,시가총액,누적거래대금,전일거래량대비,거래회전율,전일동시간거래량비율,매도비율,매수호가총잔량,매도호가총잔량\n");
+				for (size_t i = 0; i < pMain->pEngine->nCountAccrueTick; i++)
+				{	// 이게 tic 파일에서 읽은걸 변환할때는 endian 이 풀려있는데, 체결 그대로 저장하려면 풀어줘야한다.
+					LPTICK_DATAEX pData = (LPTICK_DATAEX)(pMain->pEngine->pTickBuffer + (sizeof(TICK_DATAEX) * i));
+					//sprintf_s(szTime, "%08x", pData->nTime);
+					::sprintf_s(임시버퍼, "%d,%s,%s,%d,%d,%d,%d,%d,%0.2f,%0.2f,%d,%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%d\n"
+						//whiteFile.WriteEnd("%d,%s,%s,%d,%d,%d,%d,%d,%0.2f,%0.2f,%d,%d,%0.2f,%0.2f,%0.2f,%0.2f,%d,%d\n"
+						, pData->nTime				// 9000000, 11034600, 12593100, 15300000
+						, pData->szCode
+						, 1 == pData->nTransType ? "매수" : 2 == pData->nTransType ? "매도" : "단일"
+						, (ULONG)pData->fPrice
+						, pData->nTransVolume
+						, pData->시가
+						, pData->고가
+						, pData->저가
+						, pData->등락율
+						, pData->체결강도
+						, pData->시가총액_억
+						, pData->누적거래대금
+						, pData->전일거래량대비_비율
+						, pData->거래회전율
+						, pData->전일동시간거래량비율
+						, pData->매도비율
+						, pData->매수호가총잔량
+						, pData->매도호가총잔량
+					);
+					memcpy_s(pBytePtr, _countof(임시버퍼), 임시버퍼, ::strlen(임시버퍼) + 1);
+					pBytePtr += ::strlen(임시버퍼) + 1;	// null 포함
+				}
+				size_t nSaveSize = (pBytePtr - pByte);
+				힙해제(pByte);
+				*/
+			} while (false);
 			break;
 		case IDM_EXIT:
 			::EndDialog(_hWnd, 0);
@@ -81,7 +149,7 @@ LRESULT CALLBACK DlgProcMain(HWND _hWnd, UINT _nMessage, WPARAM _wParam, LPARAM 
 					if (1 == nResult)
 					{	// 파일이면
 						디뷰("파일이네: %s", szDtopPath);
-						//DropFile(szDtopPath);
+						pMain->DropFile(szDtopPath);
 						//pGame->ReadFile(szDtopPath);
 					}
 					else if (2 == nResult)
@@ -126,7 +194,7 @@ C_MAIN::C_MAIN(HINSTANCE _hInst)
 
 C_MAIN::~C_MAIN()
 {
-
+	DSAFE_DELETE(pEngine);
 }
 
 static wchar_t wszWindowName[(1 << 7)] = { 0 };
@@ -210,7 +278,21 @@ bool C_MAIN::Create()
 		// 트레이 아이콘 만들고
 		pTrayIcon = new dk::C_TRAY_ICON(hWnd, WM_TRAYICON, wszWindowName, ::LoadIconW(hInst, (LPCWSTR)IDI_BETRADAR), IDI_BETRADAR);
 
-		//this->ThreadStart();
+		if (!pEngine)
+		{
+			pEngine = new C_ENGINE();
+			pEngine->Init();
+		}
+#if defined(_USE_ZEROMQ_)
+		pZmqSender = new C_ZMQ_SENDER("localhost", 5000);
+#endif
+		if (!pNetClient)
+		{	// 네트워크 패킷 처리하는 스레드 생성.
+			this->ThreadStart();
+			// 무한 재접속 클라
+			pNetClient = new net::C_NET_CLIENT(this, "127.0.0.1", 20000);
+			pNetClient->ThreadStart();
+		}
 
 		bShowWindow = true;
 		//::ShowWindow(hWnd, SW_SHOWNORMAL);
@@ -224,13 +306,7 @@ bool C_MAIN::Create()
 		::ShowWindow(hDlgMain, SW_SHOW);
 		::UpdateWindow(hDlgMain);
 
-		if (!pNetClient)
-		{	// 네트워크 패킷 처리하는 스레드 생성.
-			this->ThreadStart();
-			// 무한 재접속 클라
-			pNetClient = new net::C_NET_CLIENT(this, "127.0.0.1", 20000);
-			pNetClient->ThreadStart();
-		}
+		
 
 		bResult = true;
 	} while (false);
@@ -265,10 +341,12 @@ long C_MAIN::Calculate()
 	} while (false);
 	return(nResult);
 }
+
 void C_MAIN::Display()
 {
 
 }
+
 void C_MAIN::Destroy() noexcept
 {
 	{	// 경로 저장.
@@ -290,6 +368,10 @@ void C_MAIN::Destroy() noexcept
 	}
 	::DestroyWindow(hWnd);
 	::UnregisterClassW(pClassName, hInst);
+#if defined(_USE_ZEROMQ_)
+	DSAFE_DELETE(pZmqSender);
+#endif
+	DSAFE_DELETE(pEngine);
 	bExitProcess = true;
 	DSAFE_DELETE(pTrayIcon);
 }

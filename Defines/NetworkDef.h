@@ -4,8 +4,6 @@
 #include <DarkCore/DMemory.h>
 #include <DarkCore/DSocket.h>
 
-#include <DNetwork/NetworkDef.h>
-
 
 
 #if __cplusplus > 201703L
@@ -38,6 +36,9 @@ enum _PKT_INDEX_
 	, _PKT_PIPE_CREON_MAX_
 	// 여긴 키움
 	, _PKT_PIPE_KIWOOM_MIN_
+
+	, _PKT_PIPE_CONNECTED_KIWOOM_
+	, _PKT_PIPE_DISCONNECTED_KIWOOM_
 
 	, _브릿지패킷_키움_클라이언트_접속_
 	, _브릿지패킷_키움_클라이언트_접속해제_
@@ -99,6 +100,7 @@ enum _PKT_INDEX_
 	, _네트워크패킷_키움_주식체결_						// 키움 체결 데이터다
 	, _네트워크패킷_키움_주식호가잔량_					// 키움 체결 데이터다
 	, _PKT_NET_RECEIVE_TRANSACTION_EBEST_				// 이베스트 체결데이터다.
+	, _네트워크패킷_테스트_체결_						// 저장된 체결데이터다.
 	, _PKT_NET_REQUEST_LOGIN_							// 유저 로그인
 	, _PKT_NET_RESULT_LOGIN_SUCCEED_					// 로그인 성공
 	, _PKT_NET_RESULT_LOGIN_FAILED_						// 로그인 실패

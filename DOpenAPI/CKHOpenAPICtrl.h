@@ -10,6 +10,7 @@
 
 #include "CPipeClient.h"
 #include "CNetClient.h"
+#include "CZmqBase.h"
 
 
 
@@ -18,14 +19,14 @@ class C_KH_OPEN_API
 {
 private:
 	pipe::C_PIPE_CLIENT* pPipe{ nullptr };				// 받은 메시지를 최소한의 처리 후 전송만 한다.
-	net::C_NET_CLIENT* pNet{ nullptr };
+	C_ZMQ_SENDER* pZmqSender{ nullptr };
 
 protected:
 	DECLARE_DYNCREATE(C_KH_OPEN_API)
 
 public:
 	void SetHandler(pipe::C_PIPE_CLIENT* _pHandler);
-	void SetNetHandler(net::C_NET_CLIENT* _pHandler);
+	void SetHandler(C_ZMQ_SENDER* _pHandler);
 
 	CLSID const& GetClsid();
 	virtual BOOL Create(LPCSTR lpszClassName, LPCSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* _pContext = nullptr);
