@@ -8,7 +8,6 @@
     </br>
 
 ## 연락수단
-텔레그램: @darkfunc</br>
 이메일: dwerasd@gmail.com
 </br>
 ## 기부
