@@ -11,5 +11,5 @@
 이메일: dwerasd@gmail.com
 </br>
 ## 기부
-<a href="https://toss.me/도담김필동" rel="nofollow">토스로 송금하기</a></p>
+<a href="https://toss.me/dwerasd" rel="nofollow">토스로 송금하기</a></p>
 </br>
