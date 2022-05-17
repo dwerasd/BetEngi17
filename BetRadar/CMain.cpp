@@ -286,13 +286,13 @@ bool C_MAIN::Create()
 #if defined(_USE_ZEROMQ_)
 		pZmqSender = new C_ZMQ_SENDER("localhost", 5000);
 #endif
-		if (!pNetClient)
-		{	// 네트워크 패킷 처리하는 스레드 생성.
-			this->ThreadStart();
-			// 무한 재접속 클라
-			pNetClient = new net::C_NET_CLIENT(this, "127.0.0.1", 20000);
-			pNetClient->ThreadStart();
-		}
+		//if (!pNetClient)
+		//{	// 네트워크 패킷 처리하는 스레드 생성.
+		//	this->ThreadStart();
+		//	// 무한 재접속 클라
+		//	pNetClient = new net::C_NET_CLIENT(this, "127.0.0.1", 20000);
+		//	pNetClient->ThreadStart();
+		//}
 
 		bShowWindow = true;
 		//::ShowWindow(hWnd, SW_SHOWNORMAL);

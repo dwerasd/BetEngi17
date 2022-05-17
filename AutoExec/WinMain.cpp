@@ -16,7 +16,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance , _In_opt_ HINSTANCE hPrevInstance
     // TODO: 여기에 코드를 입력합니다.
 	char 설정파일[_MAX_PATH] = { 0 };
 	::GetModuleFileNameA(::GetModuleHandleW(0), 설정파일, 배열크기(설정파일));
-	for (사이즈 i = 0; i < ::strlen(설정파일); i++) { if ('\\' == 설정파일[i]) { 설정파일[i] = '/'; } }
+	for (size_t i = 0; i < ::strlen(설정파일); i++) { if ('\\' == 설정파일[i]) { 설정파일[i] = '/'; } }
 	설정파일[::strlen(설정파일) - 3] = 0;
 	strcat_s(설정파일, "ini");
 	디뷰("설정파일: %s", 설정파일);
@@ -38,7 +38,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance , _In_opt_ HINSTANCE hPrevInstance
 			dk::DLOCAL_TIME currentTime;
 			if (!(currentTime.wSecond % 5))
 			{	// 여긴 5초에 한번씩 들어온다.
-				디워드 프로세스아이디 = dk::GetProcessOf(감시할파일명);
+				DWORD 프로세스아이디 = dk::GetProcessOf(감시할파일명);
 				if (!프로세스아이디)
 				{
 					dk::파일실행(프로세스.szPath, 프로세스.szParam, true, (::LPPROCESS_INFORMATION)&프로세스);
@@ -46,7 +46,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance , _In_opt_ HINSTANCE hPrevInstance
 				}
 			}
 			dk::멈춰(10);
-		} while (msg.message != WM_QUIT);	// WM_DESTROY에서 PostQuitMessage를 호출하면 WM_QUIT가 발생함.
+		} while (WM_QUIT != msg.message);	// WM_DESTROY에서 PostQuitMessage를 호출하면 WM_QUIT가 발생함.
 	}
 	else
 	{
